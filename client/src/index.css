@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-dark-950 text-slate-100 antialiased selection:bg-cyan-500 selection:text-black;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Custom futuristic scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0c1017;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #202b3f;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00f0ff;
+  }
+}
+
+.glass-panel {
+  background: rgba(16, 23, 34, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-card {
+  background: rgba(22, 30, 46, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.12);
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 240, 255, 0.35);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+.cyber-glow {
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+}
+
+.cyber-border-glow {
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+}
+
+/* Visor pulse */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.scanline {
+  animation: scanline 4s linear infinite;
+}

@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+**/node_modules/
+client/node_modules/
+server/node_modules/
+nexa_ui/node_modules/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+server/.env
+
+# Chrome Profiles & Temporary Browser Data
+chrome-profile/
+chrome-profile-ai/
+chrome-profile*/
+**/chrome-profile/
+**/chrome-profile-ai/
+**/chrome-profile*/
+
+# Build outputs
+dist/
+build/
+client/dist/
+client/build/
+nexa_ui/dist/
+.vercel/
+
+# Reference & Temporary
+nexa_reference/
+*.tmp
+*.temp
+
+# Logs & Debugging
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
