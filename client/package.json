@@ -9,7 +9,6 @@
   "dependencies": {
     "@react-three/drei": "^9.121.4",
     "@react-three/fiber": "^8.17.14",
-    "ai-personal-agent": "file:..",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "gsap": "^3.12.7",
