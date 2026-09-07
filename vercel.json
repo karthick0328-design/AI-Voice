@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://03cb95987c8b6d.lhr.life/api/:path*"
+      "destination": "https://aivoice-os-engine.loca.lt/api/:path*"
     },
     {
       "source": "/(.*)",

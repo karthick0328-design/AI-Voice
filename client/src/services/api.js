@@ -5,7 +5,8 @@ const API_BASE_URL = (typeof process !== 'undefined' && process.env && process.e
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'bypass-tunnel-reminder': '1'
   }
 });
 
@@ -38,7 +39,7 @@ export const apiService = {
 
   // Documents
   uploadDocument: (formData) => api.post('/documents/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+    headers: { 'Content-Type': 'multipart/form-data', 'bypass-tunnel-reminder': '1' }
   }),
   getDocuments: (params) => api.get('/documents', { params }),
   searchDocuments: (query) => api.post('/documents/search', { query }),
@@ -61,7 +62,10 @@ export const apiService = {
   streamChat: async ({ conversationId, message, onEvent, signal }) => {
     const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'bypass-tunnel-reminder': '1'
+      },
       body: JSON.stringify({ conversationId, message }),
       signal
     });
