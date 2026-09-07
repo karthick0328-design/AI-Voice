@@ -1,81 +1,113 @@
 class SpeechService {
   constructor() {
     this.recognition = null;
-    this.synthesis = window.speechSynthesis;
+    this.synthesis = typeof window !== 'undefined' ? window.speechSynthesis : null;
     this.isListening = false;
     this.currentUtterance = null;
     this.voices = [];
     this.maleVoice = null;
     this.femaleVoice = null;
     this.isUnlocked = false;
-    this.initRecognition();
     this.initVoices();
   }
 
   initRecognition() {
+    if (typeof window === 'undefined') return null;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
-      this.recognition = new SpeechRecognition();
-      this.recognition.continuous = true;
-      this.recognition.interimResults = true;
-      this.recognition.lang = 'en-US';
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false; // continuous = false is 100% reliable on iOS & Android!
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      recognition.maxAlternatives = 1;
+      return recognition;
     }
+    return null;
   }
 
   initVoices() {
-    if (this.synthesis) {
-      const updateVoices = () => {
-        this.voices = this.synthesis.getVoices() || [];
-        if (this.voices.length > 0) {
-          // Cache male & female voices upfront for 0ms latency
-          this.maleVoice = this.voices.find(v => 
-            (v.name.includes('David') || v.name.includes('Mark') || v.name.includes('George') || 
-             v.name.includes('Guy') || v.name.includes('Male') || v.name.includes('Desktop - English (United States)')) && 
-            v.lang.startsWith('en')
-          ) || this.voices.find(v => v.lang.startsWith('en')) || this.voices[0];
+    if (!this.synthesis) return;
+    const updateVoices = () => {
+      this.voices = this.synthesis.getVoices() || [];
+      if (this.voices.length > 0) {
+        // Cache male & female voices (covering Windows, macOS, iOS Safari, Android Chrome)
+        this.maleVoice =
+          this.voices.find(
+            (v) =>
+              (v.name.includes('David') ||
+                v.name.includes('Mark') ||
+                v.name.includes('George') ||
+                v.name.includes('Guy') ||
+                v.name.includes('Daniel') ||
+                v.name.includes('Oliver') ||
+                v.name.includes('Arthur') ||
+                v.name.includes('Male') ||
+                v.name.toLowerCase().includes('male')) &&
+              v.lang.startsWith('en')
+          ) ||
+          this.voices.find((v) => v.lang.startsWith('en')) ||
+          this.voices[0];
 
-          this.femaleVoice = this.voices.find(v => 
-            (v.name.includes('Zira') || v.name.includes('Hazel') || v.name.includes('Jenny') || 
-             v.name.includes('Aria') || v.name.includes('Female') || v.name.includes('Sonia') ||
-             v.name.includes('Google UK English Female')) && 
-            v.lang.startsWith('en')
-          ) || this.voices.find(v => v.lang.startsWith('en')) || this.voices[0];
-        }
-      };
-      updateVoices();
-      if (this.synthesis.onvoiceschanged !== undefined) {
-        this.synthesis.onvoiceschanged = updateVoices;
+        this.femaleVoice =
+          this.voices.find(
+            (v) =>
+              (v.name.includes('Zira') ||
+                v.name.includes('Hazel') ||
+                v.name.includes('Jenny') ||
+                v.name.includes('Aria') ||
+                v.name.includes('Samantha') ||
+                v.name.includes('Karen') ||
+                v.name.includes('Victoria') ||
+                v.name.includes('Moira') ||
+                v.name.includes('Female') ||
+                v.name.toLowerCase().includes('female')) &&
+              v.lang.startsWith('en')
+          ) ||
+          this.voices.find((v) => v.lang.startsWith('en')) ||
+          this.voices[0];
       }
+    };
+
+    updateVoices();
+    if (this.synthesis.onvoiceschanged !== undefined) {
+      this.synthesis.onvoiceschanged = updateVoices;
     }
   }
 
   unlock() {
     if (this.synthesis && !this.isUnlocked) {
-      const utterance = new SpeechSynthesisUtterance('');
-      utterance.volume = 0;
-      this.synthesis.speak(utterance);
-      this.isUnlocked = true;
+      try {
+        const utterance = new SpeechSynthesisUtterance(' ');
+        utterance.volume = 0.01;
+        this.synthesis.speak(utterance);
+        this.isUnlocked = true;
+      } catch (e) {}
     }
   }
 
   isSpeechRecognitionSupported() {
-    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+    return typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
   }
 
   startListening({ onTranscript, onError, onEnd }) {
-    if (!this.recognition) {
-      if (onError) onError(new Error('Speech recognition is not supported in this browser.'));
-      return false;
-    }
-    if (this.isListening) {
-      return true;
-    }
+    this.unlock();
 
+    // Re-create instance for 100% mobile compatibility on every turn
     try {
-      this.recognition.onresult = (event) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
+      if (this.recognition) {
+        try { this.recognition.abort(); } catch (e) {}
+      }
+      this.recognition = this.initRecognition();
+      if (!this.recognition) {
+        if (onError) onError(new Error('Speech recognition not supported in this browser.'));
+        return false;
+      }
 
+      let finalTranscript = '';
+      let interimTranscript = '';
+
+      this.recognition.onresult = (event) => {
+        interimTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
@@ -120,7 +152,9 @@ class SpeechService {
 
   stopListening() {
     if (this.recognition && this.isListening) {
-      this.recognition.stop();
+      try {
+        this.recognition.stop();
+      } catch (e) {}
       this.isListening = false;
     }
   }
@@ -137,21 +171,21 @@ class SpeechService {
       .trim();
   }
 
-  /**
-   * Zero-latency instant speech execution
-   */
-  speak(text, { speed = 1.05, gender = 'boy', voiceName = '', onStart, onEnd, onError } = {}) {
+  speak(text, { speed = 1.05, gender = 'boy', onStart, onEnd, onError } = {}) {
+    this.unlock();
     if (!this.synthesis) {
       if (onError) onError(new Error('Speech synthesis not available'));
       return;
     }
 
-    if (this.synthesis.speaking) {
-      this.synthesis.cancel();
-    }
-    if (this.synthesis.paused) {
-      this.synthesis.resume();
-    }
+    try {
+      if (this.synthesis.speaking) {
+        this.synthesis.cancel();
+      }
+      if (this.synthesis.paused) {
+        this.synthesis.resume();
+      }
+    } catch (e) {}
 
     const cleanText = this.sanitizeTextForSpeech(text);
     if (!cleanText) {
@@ -160,7 +194,12 @@ class SpeechService {
     }
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.rate = Math.max(0.5, Math.min(2.0, speed));
+    utterance.rate = Math.max(0.6, Math.min(1.8, speed));
+
+    // Ensure voices are initialized
+    if (!this.maleVoice || !this.femaleVoice) {
+      this.initVoices();
+    }
 
     if (gender === 'boy' || gender === 'male') {
       utterance.pitch = 0.92;
@@ -170,34 +209,43 @@ class SpeechService {
       if (this.femaleVoice) utterance.voice = this.femaleVoice;
     }
 
+    let hasEnded = false;
+    const finish = () => {
+      if (!hasEnded) {
+        hasEnded = true;
+        this.currentUtterance = null;
+        if (onEnd) onEnd();
+      }
+    };
+
     utterance.onstart = () => {
       if (onStart) onStart();
     };
 
-    utterance.onend = () => {
-      this.currentUtterance = null;
-      if (onEnd) onEnd();
-    };
+    utterance.onend = finish;
 
     utterance.onerror = (e) => {
-      this.currentUtterance = null;
-      if (onError) onError(e);
-      if (onEnd) onEnd();
+      console.warn('[SpeechService] speak error:', e);
+      finish();
     };
 
     this.currentUtterance = utterance;
-    this.synthesis.speak(utterance);
-  }
 
-  stopSpeaking() {
-    if (this.synthesis && this.synthesis.speaking) {
-      this.synthesis.cancel();
-      this.currentUtterance = null;
+    try {
+      this.synthesis.speak(utterance);
+    } catch (err) {
+      console.error('[SpeechService] speak invocation error:', err);
+      finish();
     }
   }
 
-  getAvailableVoices() {
-    return this.voices.length > 0 ? this.voices : this.synthesis ? this.synthesis.getVoices() : [];
+  stopSpeaking() {
+    if (this.synthesis) {
+      try {
+        this.synthesis.cancel();
+      } catch (e) {}
+      this.currentUtterance = null;
+    }
   }
 }
 
