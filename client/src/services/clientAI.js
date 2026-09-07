@@ -439,7 +439,7 @@ export class ClientAI {
         url: gUrl,
         results: searchResults,
         snippet,
-        response: snippet
+        response: `Opening Google search for "${rawQuery}" for you right now!`
       };
     }
 
