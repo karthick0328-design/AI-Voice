@@ -74,7 +74,50 @@ export class YouTubeService {
     return 'GoGl1pT0TSM';
   }
 
-  static async resolveNextVideo(currentVideoId) {
+  static async resolveNextVideo(currentVideoId, currentTitle = '', playedIds = []) {
+    // 1. Clean current title to form related music query
+    let clean = (currentTitle || '')
+      .replace(/\(official.+?\)/gi, '')
+      .replace(/\[official.+?\]/gi, '')
+      .replace(/\(music video\)/gi, '')
+      .replace(/\(video song\)/gi, '')
+      .replace(/\(lyric video\)/gi, '')
+      .replace(/ft\..+$/gi, '')
+      .replace(/feat\..+$/gi, '')
+      .replace(/#\w+/g, '')
+      .replace(/@\w+/g, '')
+      .replace(/[\|\-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!clean || clean.length < 3) clean = 'trending music songs';
+    const relatableQuery = `${clean} similar songs`;
+
+    // 2. Fetch related search results from YouTube
+    try {
+      const res = await fetch(`/api/youtube/search?q=${encodeURIComponent(relatableQuery)}&exclude=${currentVideoId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.results && data.results.length > 0) {
+          // Find first result that isn't the current video and hasn't been played
+          const candidate = data.results.find(
+            r => r.videoId !== currentVideoId && !playedIds.includes(r.videoId)
+          ) || data.results.find(r => r.videoId !== currentVideoId) || data.results[0];
+
+          if (candidate && candidate.videoId) {
+            console.log(`[YouTubeService] Found relatable next track: "${candidate.title}" (${candidate.videoId}) for query "${clean}"`);
+            return {
+              id: candidate.videoId,
+              title: candidate.title
+            };
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[YouTubeService] Relatable search error:', e.message);
+    }
+
+    // 3. Fallback to curated playlist tracks
     const curIdx = PLAYLIST_TRACKS.findIndex(t => t.id === currentVideoId);
     let nextIdx = (curIdx + 1) % PLAYLIST_TRACKS.length;
     if (nextIdx < 0) nextIdx = 0;

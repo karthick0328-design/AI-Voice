@@ -111,6 +111,23 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
     };
   }, [videoId]);
 
+  const toggleFullscreen = () => {
+    if (isFullscreen) {
+      setIsFullscreen(false);
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      }
+    } else {
+      setIsFullscreen(true);
+      const elem = containerRef.current;
+      if (elem) {
+        if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      }
+    }
+  };
+
   // 3. Direct execution of all voice commands against player instance
   useEffect(() => {
     if (!lastAction || !playerRef.current) return;
@@ -138,18 +155,21 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
             break;
 
           case 'next':
-            if (videoId) {
-              historyRef.current.push({ id: videoId, title: activeTitle });
-            }
-            if (typeof p.nextVideo === 'function') {
-              try { p.nextVideo(); } catch (e) {}
-            }
-            const nextTrack = await YouTubeService.resolveNextVideo(videoId);
-            if (nextTrack && nextTrack.id) {
-              setVideoId(nextTrack.id);
-              setActiveTitle(nextTrack.title);
-              if (typeof p.loadVideoById === 'function') {
-                p.loadVideoById(nextTrack.id);
+            {
+              if (videoId) {
+                historyRef.current.push({ id: videoId, title: activeTitle });
+              }
+              if (typeof p.nextVideo === 'function') {
+                try { p.nextVideo(); } catch (e) {}
+              }
+              const playedIds = historyRef.current.map(h => h.id);
+              const nextTrack = await YouTubeService.resolveNextVideo(videoId, activeTitle, playedIds);
+              if (nextTrack && nextTrack.id) {
+                setVideoId(nextTrack.id);
+                setActiveTitle(nextTrack.title);
+                if (typeof p.loadVideoById === 'function') {
+                  p.loadVideoById(nextTrack.id);
+                }
               }
             }
             break;
@@ -240,35 +260,21 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
 
           case 'fullscreen':
             {
+              setIsFullscreen(true);
               const elem = containerRef.current;
               if (elem) {
-                if (elem.requestFullscreen) {
-                  elem.requestFullscreen().catch(() => {});
-                } else if (elem.webkitRequestFullscreen) {
-                  elem.webkitRequestFullscreen();
-                } else if (elem.mozRequestFullScreen) {
-                  elem.mozRequestFullScreen();
-                } else if (elem.msRequestFullscreen) {
-                  elem.msRequestFullscreen();
-                }
-                setIsFullscreen(true);
+                if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
+                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
               }
             }
             break;
 
           case 'exit_fullscreen':
             {
-              if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-                if (document.exitFullscreen) {
-                  document.exitFullscreen().catch(() => {});
-                } else if (document.webkitExitFullscreen) {
-                  document.webkitExitFullscreen();
-                } else if (document.mozCancelFullScreen) {
-                  document.mozCancelFullScreen();
-                } else if (document.msExitFullscreen) {
-                  document.msExitFullscreen();
-                }
-                setIsFullscreen(false);
+              setIsFullscreen(false);
+              if (document.fullscreenElement || document.webkitFullscreenElement) {
+                if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
               }
             }
             break;
@@ -292,29 +298,35 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
 
   if (!media) return null;
 
-  const searchQuery = encodeURIComponent(media.title || 'trending music');
-
   return (
     <div
       ref={containerRef}
-      className={`fixed z-40 transition-all duration-300 ${
-        isMinimized
-          ? 'bottom-20 right-6 w-72'
-          : 'top-16 left-6 sm:top-20 sm:left-8 w-[92vw] sm:w-[440px] md:w-[500px]'
+      className={`transition-all duration-300 ${
+        isFullscreen
+          ? 'fixed inset-0 w-screen h-screen z-50 bg-black flex flex-col justify-between m-0 p-0 rounded-none'
+          : isMinimized
+            ? 'fixed z-40 bottom-20 right-6 w-72'
+            : 'fixed z-40 top-16 left-6 sm:top-20 sm:left-8 w-[92vw] sm:w-[440px] md:w-[520px]'
       }`}
     >
-      <div className="bg-slate-950/95 backdrop-blur-2xl border border-red-500/60 rounded-3xl overflow-hidden shadow-[0_0_45px_rgba(239,68,68,0.4)] animate-in fade-in zoom-in-95 duration-200">
+      <div
+        className={`${
+          isFullscreen
+            ? 'w-full h-full bg-black flex flex-col rounded-none border-0'
+            : 'bg-slate-950/95 backdrop-blur-2xl border border-red-500/60 rounded-3xl overflow-hidden shadow-[0_0_45px_rgba(239,68,68,0.4)] animate-in fade-in zoom-in-95 duration-200'
+        }`}
+      >
         {/* Header Bar */}
-        <div className="px-4 py-3 bg-gradient-to-r from-red-950/70 to-slate-900/70 border-b border-red-500/30 flex items-center justify-between">
+        <div className="px-4 py-3 bg-gradient-to-r from-red-950/80 to-slate-900/80 border-b border-red-500/30 flex items-center justify-between">
           <div className="flex items-center gap-2.5 overflow-hidden">
             <div className="w-6 h-6 rounded-lg bg-red-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
               ▶
             </div>
             <div className="flex flex-col truncate">
               <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">
-                YouTube Live Player
+                {isFullscreen ? 'YouTube Fullscreen' : 'YouTube Live Player'}
               </span>
-              <span className="text-xs font-semibold text-white truncate max-w-[180px] sm:max-w-[240px]">
+              <span className="text-xs font-semibold text-white truncate max-w-[180px] sm:max-w-[320px]">
                 {activeTitle || media.title}
               </span>
             </div>
@@ -331,12 +343,21 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
               Full Tab ↗
             </a>
             <button
-              onClick={() => setIsMinimized(!isMinimized)}
-              className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition text-xs"
-              title={isMinimized ? 'Expand' : 'Minimize'}
+              onClick={toggleFullscreen}
+              className="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition text-xs flex items-center gap-1"
+              title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
             >
-              {isMinimized ? '🗖' : '🗕'}
+              {isFullscreen ? '🗗 Exit' : '⛶ Fullscreen'}
             </button>
+            {!isFullscreen && (
+              <button
+                onClick={() => setIsMinimized(!isMinimized)}
+                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition text-xs"
+                title={isMinimized ? 'Expand' : 'Minimize'}
+              >
+                {isMinimized ? '🗖' : '🗕'}
+              </button>
+            )}
             <button
               onClick={onClose}
               className="text-slate-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-white/10 transition text-sm font-bold"
@@ -348,7 +369,15 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
         </div>
 
         {/* Video Frame */}
-        <div className={`relative aspect-video w-full bg-black ${isMinimized ? 'hidden' : 'block'}`}>
+        <div
+          className={`${
+            isFullscreen
+              ? 'relative flex-1 w-full bg-black overflow-hidden flex items-center justify-center'
+              : isMinimized
+                ? 'hidden'
+                : 'relative aspect-video w-full bg-black'
+          }`}
+        >
           <div id={playerDivId.current} className="w-full h-full" />
         </div>
 
@@ -380,7 +409,8 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
                 if (videoId) {
                   historyRef.current.push({ id: videoId, title: activeTitle });
                 }
-                const nextTrack = await YouTubeService.resolveNextVideo(videoId);
+                const playedIds = historyRef.current.map(h => h.id);
+                const nextTrack = await YouTubeService.resolveNextVideo(videoId, activeTitle, playedIds);
                 if (nextTrack && nextTrack.id) {
                   setVideoId(nextTrack.id);
                   setActiveTitle(nextTrack.title);
@@ -407,6 +437,12 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
               className="px-2.5 py-1 bg-white/10 hover:bg-white/20 active:scale-95 rounded font-semibold text-white transition"
             >
               {isMuted ? '🔇 Unmute' : '🔊 Mute'}
+            </button>
+            <button
+              onClick={toggleFullscreen}
+              className="px-2.5 py-1 bg-white/10 hover:bg-white/20 active:scale-95 rounded font-semibold text-white transition"
+            >
+              {isFullscreen ? '🗗 Normal' : '⛶ Full'}
             </button>
           </div>
 

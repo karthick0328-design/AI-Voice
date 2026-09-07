@@ -44,40 +44,49 @@ export default async function handler(req, res) {
   if (pathname === '/youtube/search' || pathname.startsWith('/youtube/search')) {
     try {
       const q = url.searchParams.get('q') || req.query?.q || 'trending music';
+      const exclude = url.searchParams.get('exclude') || req.query?.exclude || '';
       const ytResponse = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
         }
       });
       const html = await ytResponse.text();
-      let videoId = null;
-      let title = q;
 
-      const idMatch = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
-      if (idMatch && idMatch[1]) videoId = idMatch[1];
-      else {
-        const watchMatch = html.match(/\/watch\?v=([a-zA-Z0-9_-]{11})/);
-        if (watchMatch && watchMatch[1]) videoId = watchMatch[1];
+      const regex = /"videoId":"([a-zA-Z0-9_-]{11})".+?"title":\{"runs":\[\{"text":"([^"]+)"\}/g;
+      let match;
+      const results = [];
+      while ((match = regex.exec(html)) !== null && results.length < 15) {
+        if (!results.some(r => r.videoId === match[1])) {
+          results.push({ videoId: match[1], title: match[2] });
+        }
       }
 
-      const titleMatch = html.match(/"title":\{"runs":\[\{"text":"([^"]+)"\}/);
-      if (titleMatch && titleMatch[1]) title = titleMatch[1];
+      // Find best match that is not the excluded current video
+      let chosen = results.find(r => r.videoId !== exclude) || results[0];
+      let videoId = chosen ? chosen.videoId : null;
+      let title = chosen ? chosen.title : q;
 
-      if (!videoId) videoId = 'z5y8Clp_TdE';
+      if (!videoId) {
+        const idMatch = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+        if (idMatch && idMatch[1]) videoId = idMatch[1];
+        else videoId = 'GoGl1pT0TSM';
+      }
 
       return res.status(200).json({
         success: true,
         query: q,
         videoId,
         title,
+        results,
         url: `https://www.youtube.com/watch?v=${videoId}`
       });
     } catch (e) {
       return res.status(200).json({
         success: true,
-        videoId: 'z5y8Clp_TdE',
+        videoId: 'GoGl1pT0TSM',
         title: 'Popular Song',
-        url: 'https://www.youtube.com/watch?v=z5y8Clp_TdE'
+        results: [],
+        url: 'https://www.youtube.com/watch?v=GoGl1pT0TSM'
       });
     }
   }
