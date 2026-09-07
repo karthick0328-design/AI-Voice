@@ -403,6 +403,16 @@ export class ClientAI {
       const lowerTopic = (coreTopic || rawQuery).toLowerCase();
       if (lowerTopic.includes('murugan') || lowerTopic.includes('kartikeya') || lowerTopic.includes('skanda')) {
         snippet = 'Lord Murugan means "the beautiful one," "youthful," or "godliness" in Tamil, and he is revered as the Hindu god of war, victory, wisdom, and courage.';
+      } else if (
+        (lowerTopic.includes('chief minister') || lowerTopic.includes('cm')) &&
+        (lowerTopic.includes('tamil') || lowerTopic.includes('tn'))
+      ) {
+        snippet = 'M. K. Stalin is the current Chief Minister of Tamil Nadu, serving as the 8th Chief Minister since May 7, 2021.';
+      } else if (
+        lowerTopic.includes('prime minister') &&
+        (lowerTopic.includes('india') || lowerTopic.includes('indian'))
+      ) {
+        snippet = 'Narendra Modi is the current Prime Minister of India, serving as the 14th Prime Minister since May 2014.';
       } else if (lowerTopic.includes('karthik') || lowerTopic.includes('kartik')) {
         snippet = 'Karthik (or Kartikeya) is an Indian name of Sanskrit origin meaning radiant, courageous, one who bestows courage, and is associated with Lord Murugan / Kartikeya.';
       } else if (lowerTopic.includes('cockpit')) {

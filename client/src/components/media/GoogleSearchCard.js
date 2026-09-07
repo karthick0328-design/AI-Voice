@@ -1,7 +1,160 @@
 import React, { useState, useEffect } from 'react';
 
-// Built-in high-accuracy Knowledge Base for Google AI Overview
+// Comprehensive Knowledge Base for Google AI Overview
 const TOPIC_KNOWLEDGE_BASE = {
+  cm_tamilnadu: {
+    title: 'M. K. Stalin',
+    topicName: 'Chief Minister of Tamil Nadu',
+    languageBadge: 'தமிழ் / English',
+    overviewLead: '**M. K. Stalin** (Muthuvel Karunanidhi Stalin) is an Indian politician serving as the **8th and current Chief Minister of Tamil Nadu** since May 7, 2021. He has been the president of the Dravida Munnetra Kazhagam (DMK) party since 2018.',
+    image: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=600&auto=format&fit=crop&q=80',
+    etymologyHeader: 'Key Facts and Administration',
+    bulletPoints: [
+      {
+        label: 'Current Office',
+        text: 'Chief Minister of Tamil Nadu (Assumed office: 7 May 2021).'
+      },
+      {
+        label: 'Political Party',
+        text: 'Dravida Munnetra Kazhagam (DMK).'
+      },
+      {
+        label: 'Constituency',
+        text: 'Kolathur Assembly constituency, Chennai.'
+      },
+      {
+        label: 'Preceded by',
+        text: 'Edappadi K. Palaniswami (AIADMK).'
+      },
+      {
+        label: 'Key Initiatives',
+        text: 'Makkalai Thedi Maruthuvam, Naan Mudhalvan, Free bus travel for women, Kalaignar Magalir Urimai Thogai.'
+      }
+    ],
+    expandedDetails: [
+      {
+        label: 'Previous Offices',
+        text: 'Deputy Chief Minister of Tamil Nadu (2009–2011), 37th Mayor of Chennai (1996–2002).'
+      },
+      {
+        label: 'Personal Life',
+        text: 'Born 1 March 1953 (Chennai); son of former Chief Minister M. Karunanidhi and Dayalu Ammal.'
+      }
+    ],
+    sources: [
+      {
+        name: 'Wikipedia',
+        domain: 'en.wikipedia.org',
+        title: 'M. K. Stalin - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/M._K._Stalin',
+        iconType: 'wikipedia'
+      },
+      {
+        name: 'TN Government',
+        domain: 'tn.gov.in',
+        title: 'Hon\'ble Chief Minister | Tamil Nadu Government Portal',
+        url: 'https://www.tn.gov.in',
+        iconType: 'heritage'
+      }
+    ],
+    organicResults: [
+      {
+        domain: 'en.wikipedia.org › wiki › List_of_chief_ministers_of_Tamil_Nadu',
+        siteName: 'Wikipedia',
+        title: 'List of chief ministers of Tamil Nadu - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/List_of_chief_ministers_of_Tamil_Nadu',
+        meta: 'Government & Politics',
+        snippet: 'The Chief Minister of Tamil Nadu is the chief executive of the Indian state of Tamil Nadu. In office since 7 May 2021, M. K. Stalin is the incumbent chief minister...',
+        iconType: 'wikipedia'
+      },
+      {
+        domain: 'en.wikipedia.org › wiki › M._K._Stalin',
+        siteName: 'Wikipedia',
+        title: 'M. K. Stalin - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/M._K._Stalin',
+        meta: 'Biography & Career',
+        snippet: 'Muthuvel Karunanidhi Stalin is an Indian politician who is the 8th and current Chief Minister of Tamil Nadu. He leads the DMK government...',
+        iconType: 'wikipedia'
+      },
+      {
+        domain: 'tn.gov.in › content › chief-ministers-tamil-nadu',
+        siteName: 'Government of Tamil Nadu',
+        title: 'Chief Ministers of Tamil Nadu - Official Portal',
+        url: 'https://www.tn.gov.in',
+        meta: 'Official State Portal',
+        snippet: 'Official profile, cabinet ministers, government orders, flagship welfare schemes, and public services of the Government of Tamil Nadu under Chief Minister M.K. Stalin.',
+        iconType: 'heritage'
+      }
+    ]
+  },
+  pm_india: {
+    title: 'Narendra Modi',
+    topicName: 'Prime Minister of India',
+    languageBadge: 'English / हिन्दी',
+    overviewLead: '**Narendra Damodardas Modi** is an Indian politician who has served as the **14th Prime Minister of India** since May 26, 2014. He previously served as the Chief Minister of Gujarat from 2001 to 2014.',
+    image: 'https://images.unsplash.com/photo-1532375810709-75b1da00537c?w=600&auto=format&fit=crop&q=80',
+    etymologyHeader: 'Key Facts and Office Details',
+    bulletPoints: [
+      {
+        label: 'Current Office',
+        text: 'Prime Minister of India (In office since 26 May 2014).'
+      },
+      {
+        label: 'Political Party',
+        text: 'Bharatiya Janata Party (BJP), NDA coalition.'
+      },
+      {
+        label: 'Parliamentary Constituency',
+        text: 'Varanasi, Uttar Pradesh.'
+      },
+      {
+        label: 'Preceded by',
+        text: 'Manmohan Singh (Indian National Congress).'
+      }
+    ],
+    expandedDetails: [
+      {
+        label: 'Born',
+        text: '17 September 1950 (Vadnagar, Bombay State, now Gujarat).'
+      }
+    ],
+    sources: [
+      {
+        name: 'Wikipedia',
+        domain: 'en.wikipedia.org',
+        title: 'Narendra Modi - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/Narendra_Modi',
+        iconType: 'wikipedia'
+      },
+      {
+        name: 'PMINDIA',
+        domain: 'pmindia.gov.in',
+        title: 'Prime Minister of India - Official Website',
+        url: 'https://www.pmindia.gov.in',
+        iconType: 'heritage'
+      }
+    ],
+    organicResults: [
+      {
+        domain: 'pmindia.gov.in',
+        siteName: 'PMINDIA',
+        title: 'Prime Minister of India: Narendra Modi',
+        url: 'https://www.pmindia.gov.in',
+        meta: 'Official Website',
+        snippet: 'Official website of the Prime Minister of India featuring speeches, news, initiatives, cabinet decisions, and citizen outreach portals.',
+        iconType: 'heritage'
+      },
+      {
+        domain: 'en.wikipedia.org › wiki › Narendra_Modi',
+        siteName: 'Wikipedia',
+        title: 'Narendra Modi - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/Narendra_Modi',
+        meta: 'Biography',
+        snippet: 'Narendra Damodardas Modi is an Indian politician serving as the 14th prime minister of India since 2014. Modi was the chief minister of Gujarat from 2001 to 2014...',
+        iconType: 'wikipedia'
+      }
+    ]
+  },
   murugan: {
     title: 'Murugan',
     topicName: 'Lord Murugan',
@@ -52,6 +205,26 @@ const TOPIC_KNOWLEDGE_BASE = {
         url: 'https://en.wikipedia.org/wiki/Kartikeya',
         iconType: 'wikipedia'
       }
+    ],
+    organicResults: [
+      {
+        domain: 'https://www.quora.com › What-does-the-name-Murugan-mean',
+        siteName: 'Quora',
+        title: 'What does the name Murugan mean? - Quora',
+        url: 'https://www.quora.com/What-does-the-name-Murugan-mean',
+        meta: '50+ answers · 6 years ago',
+        snippet: 'In Tamil, the word "Murugu" means beauty, youthfulness, godliness, and fragrance. Thus, Murugan translates to "the Handsome one", "the Youthful one", and the lord who destroys evil...',
+        iconType: 'quora'
+      },
+      {
+        domain: 'https://en.wikipedia.org › wiki › Kartikeya',
+        siteName: 'Wikipedia',
+        title: 'Kartikeya (Murugan) - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/Kartikeya',
+        meta: 'Free Encyclopedia',
+        snippet: 'Kartikeya (Sanskrit: कार्त्तिकेय), also known as Skanda, Murugan, Shanmukha and Subramanya, is the Hindu god of war. He is the son of Shiva and Parvati, brother of Ganesha...',
+        iconType: 'wikipedia'
+      }
     ]
   },
   karthik: {
@@ -96,6 +269,26 @@ const TOPIC_KNOWLEDGE_BASE = {
         url: 'https://www.quora.com/What-is-the-meaning-of-the-name-Karthik',
         iconType: 'quora'
       }
+    ],
+    organicResults: [
+      {
+        domain: 'https://en.wikipedia.org › wiki › Karthik_(actor)',
+        siteName: 'Wikipedia',
+        title: 'Karthik (actor) - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/Karthik_(actor)',
+        meta: 'Indian Actor',
+        snippet: 'Murali Karthikeyan Muthuraman, better known as Karthik, is an Indian actor, playback singer and politician who has worked predominantly in Tamil cinema...',
+        iconType: 'wikipedia'
+      },
+      {
+        domain: 'https://www.quora.com › What-is-the-meaning-of-the-name-Karthik',
+        siteName: 'Quora',
+        title: 'What is the real meaning of the name Karthick? - Quora',
+        url: 'https://www.quora.com/What-is-the-meaning-of-the-name-Karthik',
+        meta: '30+ answers',
+        snippet: 'The name Karthik represents courage, leadership, and brilliance. It is also the month in the Hindu calendar dedicated to light...',
+        iconType: 'quora'
+      }
     ]
   },
   cockpit: {
@@ -132,13 +325,17 @@ const TOPIC_KNOWLEDGE_BASE = {
         title: 'Cockpit - Wikipedia',
         url: 'https://en.wikipedia.org/wiki/Cockpit',
         iconType: 'wikipedia'
-      },
+      }
+    ],
+    organicResults: [
       {
-        name: 'Aviation Safety',
-        domain: 'aviationsafety.org',
-        title: 'Flight Deck Controls and Safety Envelope',
-        url: 'https://www.google.com/search?q=cockpit+flight+deck',
-        iconType: 'quora'
+        domain: 'https://en.wikipedia.org › wiki › Cockpit',
+        siteName: 'Wikipedia',
+        title: 'Cockpit - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/Cockpit',
+        meta: 'Aviation Engineering',
+        snippet: 'A cockpit or flight deck is the area, usually near the front of an aircraft or spacecraft, from which a pilot controls the vehicle...',
+        iconType: 'wikipedia'
       }
     ]
   }
@@ -166,7 +363,6 @@ export default function GoogleSearchCard({ media, onClose }) {
     }
   }, [media]);
 
-  // Clean up speech synthesis on unmount
   useEffect(() => {
     return () => {
       if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -181,7 +377,7 @@ export default function GoogleSearchCard({ media, onClose }) {
       const res = await fetch(`/api/websearch?q=${encodeURIComponent(q.trim())}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.results) setResults(data.results);
+        if (data.results && data.results.length > 0) setResults(data.results);
         if (data.snippet) setSnippet(data.snippet);
       }
     } catch (e) {}
@@ -196,20 +392,37 @@ export default function GoogleSearchCard({ media, onClose }) {
 
   if (!media || media.type !== 'google') return null;
 
-  const currentQuery = query || media.title || 'mean by Murugan';
+  const currentQuery = query || media.title || 'the chief minister of Tamilnadu';
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(currentQuery)}`;
   const lowerQ = currentQuery.toLowerCase();
 
-  // Determine matched knowledge topic
+  // Match knowledge topic
   let matchedTopic = null;
-  if (lowerQ.includes('murugan') || lowerQ.includes('kartikeya') || lowerQ.includes('skanda')) {
+  if (
+    (lowerQ.includes('chief minister') || lowerQ.includes('cm')) &&
+    (lowerQ.includes('tamil') || lowerQ.includes('tn'))
+  ) {
+    matchedTopic = TOPIC_KNOWLEDGE_BASE.cm_tamilnadu;
+  } else if (
+    lowerQ.includes('stalin') ||
+    lowerQ.includes('m.k. stalin') ||
+    lowerQ.includes('m k stalin')
+  ) {
+    matchedTopic = TOPIC_KNOWLEDGE_BASE.cm_tamilnadu;
+  } else if (
+    lowerQ.includes('prime minister') &&
+    (lowerQ.includes('india') || lowerQ.includes('indian'))
+  ) {
+    matchedTopic = TOPIC_KNOWLEDGE_BASE.pm_india;
+  } else if (lowerQ.includes('modi') || lowerQ.includes('narendra modi')) {
+    matchedTopic = TOPIC_KNOWLEDGE_BASE.pm_india;
+  } else if (lowerQ.includes('murugan') || lowerQ.includes('kartikeya') || lowerQ.includes('skanda')) {
     matchedTopic = TOPIC_KNOWLEDGE_BASE.murugan;
   } else if (lowerQ.includes('karthik') || lowerQ.includes('karthick')) {
     matchedTopic = TOPIC_KNOWLEDGE_BASE.karthik;
   } else if (lowerQ.includes('cockpit') || lowerQ.includes('flight deck')) {
     matchedTopic = TOPIC_KNOWLEDGE_BASE.cockpit;
   } else {
-    // Dynamic generated topic
     const cleaned = currentQuery
       .replace(/^(?:what is mean by|mean by|what is the meaning of|meaning of|what is|who is|search for|search)\s+/i, '')
       .trim();
@@ -250,13 +463,14 @@ export default function GoogleSearchCard({ media, onClose }) {
           iconType: 'wikipedia'
         },
         {
-          name: 'Quora',
-          domain: 'quora.com',
-          title: `Discussion & Context on ${cleaned} - Quora`,
+          name: 'Web Source',
+          domain: 'google.com',
+          title: `Discussion & Context on ${cleaned}`,
           url: googleUrl,
           iconType: 'quora'
         }
-      ]
+      ],
+      organicResults: []
     };
   }
 
@@ -290,6 +504,22 @@ export default function GoogleSearchCard({ media, onClose }) {
       return part;
     });
   };
+
+  // Organic search results to show (matches query or live results)
+  const displayOrganicResults =
+    matchedTopic.organicResults && matchedTopic.organicResults.length > 0
+      ? matchedTopic.organicResults
+      : results && results.length > 0
+        ? results.map(r => ({
+            domain: r.displayUrl || r.url,
+            siteName: r.displayUrl ? r.displayUrl.split('/')[0] : 'Web Source',
+            title: r.title || `${currentQuery} - Overview`,
+            url: r.url,
+            meta: 'Verified Search',
+            snippet: r.snippet,
+            iconType: 'globe'
+          }))
+        : [];
 
   return (
     <div
@@ -530,7 +760,7 @@ export default function GoogleSearchCard({ media, onClose }) {
                   </div>
                 </div>
 
-                {/* Right: Deity Thumbnail & Source Cards */}
+                {/* Right: Topic Thumbnail & Source Cards */}
                 <div className="md:col-span-4 flex flex-col gap-3">
                   
                   {/* Photo Thumbnail */}
@@ -592,83 +822,46 @@ export default function GoogleSearchCard({ media, onClose }) {
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════ */}
-            {/* 5. ORGANIC WEB RESULTS (Matching Google Search) */}
+            {/* 5. ORGANIC WEB RESULTS (Matches exact query) */}
             {/* ═══════════════════════════════════════════════════════════════ */}
             <div className="flex flex-col gap-6 pt-2">
               
-              {/* Organic 1: Quora */}
-              <div className="flex flex-col gap-1.5 group max-w-3xl">
-                <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
-                  <div className="w-5 h-5 rounded-full bg-[#b92b27] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
-                    Q
-                  </div>
-                  <div className="flex flex-col truncate">
-                    <span className="font-medium text-slate-200 text-xs">Quora</span>
-                    <span className="text-[11px] text-[#9aa0a6] truncate">https://www.quora.com › What-does-the-name-Murugan-mean</span>
-                  </div>
-                </div>
-                <a
-                  href="https://www.quora.com/What-does-the-name-Murugan-mean"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base sm:text-lg font-medium text-[#8ab4f8] group-hover:underline leading-snug"
-                >
-                  What does the name Murugan mean? - Quora
-                </a>
-                <div className="text-[11px] text-slate-400 font-medium">
-                  50+ answers · 6 years ago
-                </div>
-                <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed">
-                  In Tamil, the word "Murugu" means beauty, youthfulness, godliness, and fragrance. Thus, Murugan translates to "the Handsome one", "the Youthful one", and the lord who destroys evil...
-                </p>
-              </div>
-
-              {/* Organic 2: Wikipedia */}
-              <div className="flex flex-col gap-1.5 group max-w-3xl">
-                <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
-                  <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
-                    W
-                  </div>
-                  <div className="flex flex-col truncate">
-                    <span className="font-medium text-slate-200 text-xs">Wikipedia</span>
-                    <span className="text-[11px] text-[#9aa0a6] truncate">https://en.wikipedia.org › wiki › Kartikeya</span>
-                  </div>
-                </div>
-                <a
-                  href="https://en.wikipedia.org/wiki/Kartikeya"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base sm:text-lg font-medium text-[#8ab4f8] group-hover:underline leading-snug"
-                >
-                  Kartikeya (Murugan) - Wikipedia
-                </a>
-                <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed">
-                  Kartikeya (Sanskrit: कार्त्तिकेय), also known as Skanda, Murugan, Shanmukha and Subramanya, is the Hindu god of war. He is the son of Shiva and Parvati, brother of Ganesha...
-                </p>
-              </div>
-
-              {/* Organic 3: Dynamic Search Results */}
-              {results && results.length > 0 && results.map((res, idx) => (
+              {displayOrganicResults.map((item, idx) => (
                 <div key={idx} className="flex flex-col gap-1.5 group max-w-3xl">
                   <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
-                    <div className="w-5 h-5 rounded-full bg-[#303134] border border-slate-600 flex items-center justify-center text-[10px] font-bold text-[#8ab4f8] flex-shrink-0">
-                      🌐
-                    </div>
+                    {item.iconType === 'quora' ? (
+                      <div className="w-5 h-5 rounded-full bg-[#b92b27] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
+                        Q
+                      </div>
+                    ) : item.iconType === 'wikipedia' ? (
+                      <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
+                        W
+                      </div>
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-[#303134] border border-slate-600 flex items-center justify-center text-[10px] font-bold text-[#8ab4f8] flex-shrink-0">
+                        🌐
+                      </div>
+                    )}
                     <div className="flex flex-col truncate">
-                      <span className="font-medium text-slate-200 text-xs">{res.displayUrl || 'Web Result'}</span>
-                      <span className="text-[11px] text-[#9aa0a6] truncate">{res.url}</span>
+                      <span className="font-medium text-slate-200 text-xs">{item.siteName}</span>
+                      <span className="text-[11px] text-[#9aa0a6] truncate">{item.domain}</span>
                     </div>
                   </div>
                   <a
-                    href={res.url}
+                    href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-base sm:text-lg font-medium text-[#8ab4f8] group-hover:underline leading-snug"
                   >
-                    {res.title || `${currentQuery} - Overview`}
+                    {item.title}
                   </a>
-                  <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed line-clamp-2">
-                    {res.snippet}
+                  {item.meta && (
+                    <div className="text-[11px] text-slate-400 font-medium">
+                      {item.meta}
+                    </div>
+                  )}
+                  <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed">
+                    {item.snippet}
                   </p>
                 </div>
               ))}
