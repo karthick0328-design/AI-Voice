@@ -125,16 +125,35 @@ export const AgentProvider = ({ children }) => {
       return;
     }
 
-    // If Google search requested
-    if (localResult.action === 'google') {
-      openTab(localResult.url);
-      setActiveMedia({
-        type: 'google',
-        title: localResult.title,
-        directUrl: localResult.url,
-        snippet: localResult.snippet,
-        results: localResult.results || []
-      });
+    // If Google browser automation requested (Open Google or Search)
+    if (
+      localResult.action === 'google_search' ||
+      localResult.action === 'google_open' ||
+      localResult.action === 'google'
+    ) {
+      // 1. Open authentic real Google URL in browser
+      const targetUrl = localResult.url || 'https://www.google.com/';
+      openTab(targetUrl);
+
+      // 2. Trigger backend Puppeteer browser automation
+      try {
+        if (localResult.action === 'google_open') {
+          fetch('/api/google/open', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+          }).catch(() => {});
+        } else {
+          fetch('/api/google/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: localResult.query || localResult.title || '' })
+          }).catch(() => {});
+        }
+      } catch (e) {}
+
+      // Clear any previous media card so no fake Google UI appears
+      setActiveMedia(null);
       startSpeaking(localResult.response, 'hello');
       return;
     }

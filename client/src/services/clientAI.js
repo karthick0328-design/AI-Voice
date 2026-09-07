@@ -363,9 +363,11 @@ export class ClientAI {
     }
 
     // ═════════════════════════════════════════════════════════════════════════
-    // 3. GOOGLE / WEB SEARCH (Check before generic YouTube fallback)
+    // 3. GOOGLE BROWSER AUTOMATION (Open Google & Search)
     // ═════════════════════════════════════════════════════════════════════════
     if (
+      lower.startsWith('open google') ||
+      lower.startsWith('launch google') ||
       lower.startsWith('google') ||
       lower.includes('search google') ||
       lower.includes('google search') ||
@@ -384,62 +386,30 @@ export class ClientAI {
       lower.startsWith('explain') ||
       (lower.startsWith('search ') && !lower.includes('youtube') && !lower.includes('song') && !lower.includes('music'))
     ) {
-      let rawQuery = text
-        .replace(/^(?:search\s+(?:on\s+)?google\s+(?:for|about)?|google\s+search\s+(?:for|about)?|google\s+|search\s+(?:for|about)?|search\s+|who\s+is|what\s+is|tell\s+me\s+about|explain)\s+/gi, '')
+      // 1. Check if user just wants to open Google home page
+      if (lower === 'open google' || lower === 'open google.com' || lower === 'launch google' || lower === 'google') {
+        return {
+          action: 'google_open',
+          url: 'https://www.google.com/',
+          response: 'Opening Google for you right now!'
+        };
+      }
+
+      // 2. Extract ONLY the clean actual search query
+      let cleanQuery = text
+        .replace(/^(?:open\s+(?:the\s+)?google\s+(?:and\s+)?(?:search\s+(?:for\s+)?|find\s+|look\s+up\s+)?|search\s+(?:on\s+)?google\s+(?:for\s+)?|google\s+search\s+(?:for\s+)?|search\s+for\s+|search\s+|find\s+|look\s+up\s+)/gi, '')
         .replace(/[\?\.]/g, '')
         .trim();
 
-      if (!rawQuery) rawQuery = 'trending news and topics';
+      if (!cleanQuery) cleanQuery = text.replace(/open\s+google/gi, '').trim() || 'trending topics';
 
-      // Extract core topic keyword
-      const coreTopic = rawQuery
-        .replace(/^(?:mean\s+by|the\s+meaning\s+of|meaning\s+of)\s+/gi, '')
-        .trim();
-
-      let snippet = `Here are the search results and AI overview for "${rawQuery}".`;
-      let searchResults = [];
-
-      // Built-in intelligent meanings
-      const lowerTopic = (coreTopic || rawQuery).toLowerCase();
-      if (lowerTopic.includes('murugan') || lowerTopic.includes('kartikeya') || lowerTopic.includes('skanda')) {
-        snippet = 'Lord Murugan means "the beautiful one," "youthful," or "godliness" in Tamil, and he is revered as the Hindu god of war, victory, wisdom, and courage.';
-      } else if (
-        (lowerTopic.includes('chief minister') || lowerTopic.includes('cm')) &&
-        (lowerTopic.includes('tamil') || lowerTopic.includes('tn'))
-      ) {
-        snippet = 'C. Joseph Vijay is the Chief Minister of Tamil Nadu, serving since 2026.';
-      } else if (
-        lowerTopic.includes('prime minister') &&
-        (lowerTopic.includes('india') || lowerTopic.includes('indian'))
-      ) {
-        snippet = 'Narendra Modi is the current Prime Minister of India, serving as the 14th Prime Minister since May 2014.';
-      } else if (lowerTopic.includes('karthik') || lowerTopic.includes('kartik')) {
-        snippet = 'Karthik (or Kartikeya) is an Indian name of Sanskrit origin meaning radiant, courageous, one who bestows courage, and is associated with Lord Murugan / Kartikeya.';
-      } else if (lowerTopic.includes('cockpit')) {
-        snippet = 'A cockpit or flight deck is the area, usually near the front of an aircraft or spacecraft, from which a pilot controls the vehicle.';
-      } else {
-        try {
-          const sRes = await fetch(`/api/websearch?q=${encodeURIComponent(rawQuery)}`);
-          if (sRes.ok) {
-            const sData = await sRes.json();
-            if (sData && sData.results && sData.results.length > 0) {
-              searchResults = sData.results;
-              if (sData.results[0].snippet) {
-                snippet = sData.results[0].snippet;
-              }
-            }
-          }
-        } catch (e) {}
-      }
-
-      const gUrl = `https://www.google.com/search?q=${encodeURIComponent(rawQuery)}`;
+      const gUrl = `https://www.google.com/search?q=${encodeURIComponent(cleanQuery)}`;
       return {
-        action: 'google',
-        title: rawQuery,
+        action: 'google_search',
+        query: cleanQuery,
+        title: cleanQuery,
         url: gUrl,
-        results: searchResults,
-        snippet,
-        response: `Opening Google search for "${rawQuery}" for you right now!`
+        response: `Searching Google for "${cleanQuery}" for you right now!`
       };
     }
 

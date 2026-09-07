@@ -79,6 +79,12 @@ router.get('/youtube/search', youtubeController.searchYouTube);
 router.post('/youtube/control', youtubeController.executeControl);
 router.get('/youtube/status', youtubeController.getStatus);
 
+// Google Real Browser Automation
+import * as googleController from '../controllers/googleController.js';
+router.post('/google/open', googleController.openGoogle);
+router.post('/google/search', googleController.searchGoogle);
+router.post('/google/action', googleController.executeGoogleAction);
+
 // Tools info
 router.get('/tools', (req, res) => {
   res.json(toolRegistry.getAllTools().map(t => ({

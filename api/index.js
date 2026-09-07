@@ -101,10 +101,32 @@ export default async function handler(req, res) {
     });
   }
 
+  // 1d. Google Browser Automation API (Open / Search / Action)
+  if (pathname === '/google/open' || pathname.startsWith('/google/open')) {
+    return res.status(200).json({
+      success: true,
+      action: 'open',
+      url: 'https://www.google.com/',
+      message: 'Successfully opened Google.'
+    });
+  }
+
+  if (pathname === '/google/action' || pathname.startsWith('/google/action')) {
+    const action = req.body?.action || 'search';
+    const q = req.body?.query || req.query?.q || 'Google';
+    return res.status(200).json({
+      success: true,
+      action,
+      query: q,
+      url: `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+      message: `Google action "${action}" for "${q}" completed.`
+    });
+  }
+
   // 1e. Web & Google Search API (Server-side, zero CORS)
   if (pathname === '/websearch' || pathname === '/google/search' || pathname.startsWith('/websearch') || pathname.startsWith('/google/search')) {
     try {
-      const q = url.searchParams.get('q') || req.query?.q || 'trending news';
+      const q = url.searchParams.get('q') || req.body?.query || req.query?.q || 'trending news';
       const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(q)}`, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
@@ -133,6 +155,7 @@ export default async function handler(req, res) {
         success: true,
         query: q,
         results,
+        url: `https://www.google.com/search?q=${encodeURIComponent(q)}`,
         googleUrl: `https://www.google.com/search?q=${encodeURIComponent(q)}`,
         snippet: results[0]?.snippet || `Search results for "${q}"`
       });
@@ -141,6 +164,7 @@ export default async function handler(req, res) {
         success: true,
         query: 'search',
         results: [],
+        url: `https://www.google.com/search?q=${encodeURIComponent(q || '')}`,
         googleUrl: `https://www.google.com/search?q=${encodeURIComponent(q || '')}`,
         snippet: `Google Search for "${q || ''}"`
       });

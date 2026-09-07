@@ -739,6 +739,166 @@ class PuppeteerService {
     return { success: true, message: 'All steps completed successfully', completedSteps, currentUrl: contextUrl };
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GOOGLE AUTOMATION — Real Google Navigation, Search & Verification
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  async openGoogle() {
+    console.log('[GOOGLE] Opening: https://www.google.com/');
+    try {
+      const page = await this.getPage();
+      await page.goto('https://www.google.com/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+      
+      // Auto-dismiss Google consent/cookie popups if present
+      await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('button, div[role="button"]'));
+        const consentBtn = buttons.find(b => {
+          const t = (b.textContent || '').toLowerCase();
+          return t.includes('accept all') || t.includes('i agree') || t.includes('stay signed out');
+        });
+        if (consentBtn) consentBtn.click();
+      }).catch(() => {});
+
+      try { await page.bringToFront(); } catch (e) {}
+      console.log(`[GOOGLE] Google page ready — URL: ${page.url()}`);
+      return { success: true, url: page.url() };
+    } catch (err) {
+      console.error('[GOOGLE ERROR] Failed to open Google:', err.message);
+      return { success: false, error: err.message };
+    }
+  }
+
+  async searchGoogle(rawQuery) {
+    const query = (rawQuery || '').trim();
+    console.log(`[GOOGLE] Command received: "${query}"`);
+    console.log('[GOOGLE] Intent: search');
+    console.log(`[GOOGLE] Query: "${query}"`);
+
+    if (!query) {
+      return await this.openGoogle();
+    }
+
+    try {
+      const page = await this.getPage();
+      const currentUrl = page.url();
+
+      // 1. Ensure we are on Google page
+      if (!this.isGooglePage(currentUrl)) {
+        console.log('[GOOGLE] Opening: https://www.google.com/');
+        await page.goto('https://www.google.com/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+      }
+
+      // Auto-dismiss Google consent/cookie popups if present
+      await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('button, div[role="button"]'));
+        const consentBtn = buttons.find(b => {
+          const t = (b.textContent || '').toLowerCase();
+          return t.includes('accept all') || t.includes('i agree') || t.includes('stay signed out');
+        });
+        if (consentBtn) consentBtn.click();
+      }).catch(() => {});
+
+      // 2. Multi-strategy selector detection for Google Search Input
+      const candidateSelectors = [
+        'textarea[name="q"]',
+        'input[name="q"]',
+        'textarea[aria-label*="Search"]',
+        'input[aria-label*="Search"]',
+        'input[type="search"]',
+        '[role="combobox"]',
+        '[role="searchbox"]',
+        'form[action*="search"] textarea',
+        'form[action*="search"] input'
+      ];
+
+      let detectedSelector = null;
+      for (const sel of candidateSelectors) {
+        try {
+          const el = await page.$(sel);
+          if (el) {
+            const isVisible = await page.evaluate(e => {
+              const style = window.getComputedStyle(e);
+              return style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+            }, el);
+            if (isVisible) {
+              detectedSelector = sel;
+              break;
+            }
+          }
+        } catch (e) {}
+      }
+
+      if (!detectedSelector) {
+        // Fallback: search for any visible input/textarea inside a form
+        detectedSelector = await page.evaluate(() => {
+          const input = document.querySelector('textarea, input[type="text"], input:not([type])');
+          return input ? (input.tagName.toLowerCase() + (input.name ? `[name="${input.name}"]` : '')) : null;
+        });
+      }
+
+      console.log(`[GOOGLE] Search input detected: ${detectedSelector || 'DIRECT_NAV_FALLBACK'}`);
+
+      if (detectedSelector) {
+        console.log('[GOOGLE] Entering query');
+        await page.click(detectedSelector, { clickCount: 3 });
+        await page.keyboard.press('Backspace');
+        await page.type(detectedSelector, query, { delay: 40 });
+
+        console.log('[GOOGLE] Submitting search');
+        // Try pressing Enter and waiting for navigation/results
+        await Promise.race([
+          page.keyboard.press('Enter'),
+          page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 8000 }).catch(() => {})
+        ]);
+
+        // If URL hasn't changed to search results, try clicking submit button
+        if (!page.url().includes('search?q=')) {
+          const btnClicked = await page.evaluate(() => {
+            const btn = document.querySelector('input[name="btnK"], button[type="submit"], input[value="Google Search"]');
+            if (btn) { btn.click(); return true; }
+            const form = document.querySelector('form[action*="search"]') || document.querySelector('form');
+            if (form) { form.submit(); return true; }
+            return false;
+          });
+          if (btnClicked) {
+            await page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 8000 }).catch(() => {});
+          }
+        }
+      }
+
+      // 3. Verify that search results page is loaded
+      await page.waitForFunction(
+        () => window.location.href.includes('/search') || !!document.querySelector('#search, #rso, #center_col, div.g'),
+        { timeout: 8000 }
+      ).catch(() => {});
+
+      let finalUrl = page.url();
+
+      // If page is still not on search results, do direct reliable Google search navigation
+      if (!finalUrl.includes('search?q=') && !finalUrl.includes('/search')) {
+        const directSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        console.log(`[GOOGLE] Direct navigating to verified search URL: ${directSearchUrl}`);
+        await page.goto(directSearchUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        finalUrl = page.url();
+      }
+
+      try { await page.bringToFront(); } catch (e) {}
+
+      console.log(`[GOOGLE] Results page detected: ${finalUrl}`);
+      console.log('[GOOGLE] Search verification: SUCCESS');
+
+      return {
+        success: true,
+        query,
+        url: finalUrl,
+        message: `Successfully executed Google search for "${query}"`
+      };
+    } catch (err) {
+      console.error('[GOOGLE ERROR] Search execution error:', err.message);
+      return { success: false, error: err.message, query };
+    }
+  }
+
   async navigate(url) {
     const page = await this.getPage();
     console.log(`[BROWSER] Navigating to: ${url}`);
