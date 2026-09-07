@@ -407,7 +407,7 @@ export class ClientAI {
         (lowerTopic.includes('chief minister') || lowerTopic.includes('cm')) &&
         (lowerTopic.includes('tamil') || lowerTopic.includes('tn'))
       ) {
-        snippet = 'M. K. Stalin is the current Chief Minister of Tamil Nadu, serving as the 8th Chief Minister since May 7, 2021.';
+        snippet = 'C. Joseph Vijay is the Chief Minister of Tamil Nadu, serving since 2026.';
       } else if (
         lowerTopic.includes('prime minister') &&
         (lowerTopic.includes('india') || lowerTopic.includes('indian'))

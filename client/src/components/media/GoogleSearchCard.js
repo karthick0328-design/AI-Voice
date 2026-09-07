@@ -1,161 +1,47 @@
 import React, { useState, useEffect } from 'react';
 
-// Comprehensive Knowledge Base for Google AI Overview
+// Comprehensive Knowledge Base
 const TOPIC_KNOWLEDGE_BASE = {
   cm_tamilnadu: {
-    title: 'M. K. Stalin',
-    topicName: 'Chief Minister of Tamil Nadu',
-    languageBadge: 'தமிழ் / English',
-    overviewLead: '**M. K. Stalin** (Muthuvel Karunanidhi Stalin) is an Indian politician serving as the **8th and current Chief Minister of Tamil Nadu** since May 7, 2021. He has been the president of the Dravida Munnetra Kazhagam (DMK) party since 2018.',
-    image: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=600&auto=format&fit=crop&q=80',
-    etymologyHeader: 'Key Facts and Administration',
-    bulletPoints: [
+    type: 'direct_answer',
+    breadcrumb: 'Tamil Nadu › Chief minister',
+    headlineName: 'C. Joseph Vijay',
+    subText: 'Since 2026',
+    wikipedia: {
+      siteName: 'Wikipedia',
+      domain: 'https://en.wikipedia.org › wiki › Chief_Minister_of_Ta... ',
+      title: 'Chief Minister of Tamil Nadu',
+      verified: true,
+      snippet: 'M. Karunanidhi of the DMK succeeded Annadurai, and was the longest-serving chief minister, holding the office for nearly nineteen years across five tenures. Read more',
+      pills: ['List', 'Chief Ministers of Madras State', 'Chief Ministers of Tamil Nadu', 'Statistics'],
+      url: 'https://en.wikipedia.org/wiki/List_of_chief_ministers_of_Tamil_Nadu'
+    },
+    topStories: [
       {
-        label: 'Current Office',
-        text: 'Chief Minister of Tamil Nadu (Assumed office: 7 May 2021).'
-      },
-      {
-        label: 'Political Party',
-        text: 'Dravida Munnetra Kazhagam (DMK).'
-      },
-      {
-        label: 'Constituency',
-        text: 'Kolathur Assembly constituency, Chennai.'
-      },
-      {
-        label: 'Preceded by',
-        text: 'Edappadi K. Palaniswami (AIADMK).'
-      },
-      {
-        label: 'Key Initiatives',
-        text: 'Makkalai Thedi Maruthuvam, Naan Mudhalvan, Free bus travel for women, Kalaignar Magalir Urimai Thogai.'
-      }
-    ],
-    expandedDetails: [
-      {
-        label: 'Previous Offices',
-        text: 'Deputy Chief Minister of Tamil Nadu (2009–2011), 37th Mayor of Chennai (1996–2002).'
-      },
-      {
-        label: 'Personal Life',
-        text: 'Born 1 March 1953 (Chennai); son of former Chief Minister M. Karunanidhi and Dayalu Ammal.'
-      }
-    ],
-    sources: [
-      {
-        name: 'Wikipedia',
-        domain: 'en.wikipedia.org',
-        title: 'M. K. Stalin - Wikipedia',
-        url: 'https://en.wikipedia.org/wiki/M._K._Stalin',
-        iconType: 'wikipedia'
-      },
-      {
-        name: 'TN Government',
-        domain: 'tn.gov.in',
-        title: 'Hon\'ble Chief Minister | Tamil Nadu Government Portal',
-        url: 'https://www.tn.gov.in',
-        iconType: 'heritage'
-      }
-    ],
-    organicResults: [
-      {
-        domain: 'en.wikipedia.org › wiki › List_of_chief_ministers_of_Tamil_Nadu',
-        siteName: 'Wikipedia',
-        title: 'List of chief ministers of Tamil Nadu - Wikipedia',
-        url: 'https://en.wikipedia.org/wiki/List_of_chief_ministers_of_Tamil_Nadu',
-        meta: 'Government & Politics',
-        snippet: 'The Chief Minister of Tamil Nadu is the chief executive of the Indian state of Tamil Nadu. In office since 7 May 2021, M. K. Stalin is the incumbent chief minister...',
-        iconType: 'wikipedia'
-      },
-      {
-        domain: 'en.wikipedia.org › wiki › M._K._Stalin',
-        siteName: 'Wikipedia',
-        title: 'M. K. Stalin - Wikipedia',
-        url: 'https://en.wikipedia.org/wiki/M._K._Stalin',
-        meta: 'Biography & Career',
-        snippet: 'Muthuvel Karunanidhi Stalin is an Indian politician who is the 8th and current Chief Minister of Tamil Nadu. He leads the DMK government...',
-        iconType: 'wikipedia'
-      },
-      {
-        domain: 'tn.gov.in › content › chief-ministers-tamil-nadu',
-        siteName: 'Government of Tamil Nadu',
-        title: 'Chief Ministers of Tamil Nadu - Official Portal',
-        url: 'https://www.tn.gov.in',
-        meta: 'Official State Portal',
-        snippet: 'Official profile, cabinet ministers, government orders, flagship welfare schemes, and public services of the Government of Tamil Nadu under Chief Minister M.K. Stalin.',
-        iconType: 'heritage'
+        title: 'Tamil Nadu Chief Minister Joseph Vijay accuses DMK of corruption',
+        source: 'Top stories',
+        url: 'https://www.google.com/search?q=chief+minister+of+tamil+nadu+news'
       }
     ]
   },
   pm_india: {
-    title: 'Narendra Modi',
-    topicName: 'Prime Minister of India',
-    languageBadge: 'English / हिन्दी',
-    overviewLead: '**Narendra Damodardas Modi** is an Indian politician who has served as the **14th Prime Minister of India** since May 26, 2014. He previously served as the Chief Minister of Gujarat from 2001 to 2014.',
-    image: 'https://images.unsplash.com/photo-1532375810709-75b1da00537c?w=600&auto=format&fit=crop&q=80',
-    etymologyHeader: 'Key Facts and Office Details',
-    bulletPoints: [
-      {
-        label: 'Current Office',
-        text: 'Prime Minister of India (In office since 26 May 2014).'
-      },
-      {
-        label: 'Political Party',
-        text: 'Bharatiya Janata Party (BJP), NDA coalition.'
-      },
-      {
-        label: 'Parliamentary Constituency',
-        text: 'Varanasi, Uttar Pradesh.'
-      },
-      {
-        label: 'Preceded by',
-        text: 'Manmohan Singh (Indian National Congress).'
-      }
-    ],
-    expandedDetails: [
-      {
-        label: 'Born',
-        text: '17 September 1950 (Vadnagar, Bombay State, now Gujarat).'
-      }
-    ],
-    sources: [
-      {
-        name: 'Wikipedia',
-        domain: 'en.wikipedia.org',
-        title: 'Narendra Modi - Wikipedia',
-        url: 'https://en.wikipedia.org/wiki/Narendra_Modi',
-        iconType: 'wikipedia'
-      },
-      {
-        name: 'PMINDIA',
-        domain: 'pmindia.gov.in',
-        title: 'Prime Minister of India - Official Website',
-        url: 'https://www.pmindia.gov.in',
-        iconType: 'heritage'
-      }
-    ],
-    organicResults: [
-      {
-        domain: 'pmindia.gov.in',
-        siteName: 'PMINDIA',
-        title: 'Prime Minister of India: Narendra Modi',
-        url: 'https://www.pmindia.gov.in',
-        meta: 'Official Website',
-        snippet: 'Official website of the Prime Minister of India featuring speeches, news, initiatives, cabinet decisions, and citizen outreach portals.',
-        iconType: 'heritage'
-      },
-      {
-        domain: 'en.wikipedia.org › wiki › Narendra_Modi',
-        siteName: 'Wikipedia',
-        title: 'Narendra Modi - Wikipedia',
-        url: 'https://en.wikipedia.org/wiki/Narendra_Modi',
-        meta: 'Biography',
-        snippet: 'Narendra Damodardas Modi is an Indian politician serving as the 14th prime minister of India since 2014. Modi was the chief minister of Gujarat from 2001 to 2014...',
-        iconType: 'wikipedia'
-      }
-    ]
+    type: 'direct_answer',
+    breadcrumb: 'India › Prime minister',
+    headlineName: 'Narendra Modi',
+    subText: 'Since 2014',
+    wikipedia: {
+      siteName: 'Wikipedia',
+      domain: 'https://en.wikipedia.org › wiki › Narendra_Modi ',
+      title: 'Prime Minister of India',
+      verified: true,
+      snippet: 'Narendra Damodardas Modi is an Indian politician serving as the 14th prime minister of India since May 2014. He previously served as Chief Minister of Gujarat.',
+      pills: ['List of Prime Ministers', 'Cabinet', 'Official Residence', 'Tenure'],
+      url: 'https://en.wikipedia.org/wiki/Narendra_Modi'
+    },
+    topStories: []
   },
   murugan: {
+    type: 'ai_overview',
     title: 'Murugan',
     topicName: 'Lord Murugan',
     languageBadge: 'தமிழ்',
@@ -228,6 +114,7 @@ const TOPIC_KNOWLEDGE_BASE = {
     ]
   },
   karthik: {
+    type: 'ai_overview',
     title: 'Karthik',
     topicName: 'Karthik (Kartikeya)',
     languageBadge: 'தமிழ்',
@@ -292,6 +179,7 @@ const TOPIC_KNOWLEDGE_BASE = {
     ]
   },
   cockpit: {
+    type: 'ai_overview',
     title: 'Cockpit',
     topicName: 'Cockpit (Flight Deck)',
     languageBadge: 'Aviation',
@@ -392,7 +280,7 @@ export default function GoogleSearchCard({ media, onClose }) {
 
   if (!media || media.type !== 'google') return null;
 
-  const currentQuery = query || media.title || 'the chief minister of Tamilnadu';
+  const currentQuery = query || media.title || 'chief minister of tamil nadu';
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(currentQuery)}`;
   const lowerQ = currentQuery.toLowerCase();
 
@@ -404,9 +292,9 @@ export default function GoogleSearchCard({ media, onClose }) {
   ) {
     matchedTopic = TOPIC_KNOWLEDGE_BASE.cm_tamilnadu;
   } else if (
-    lowerQ.includes('stalin') ||
-    lowerQ.includes('m.k. stalin') ||
-    lowerQ.includes('m k stalin')
+    lowerQ.includes('joseph vijay') ||
+    lowerQ.includes('c. joseph vijay') ||
+    lowerQ.includes('vijay') && lowerQ.includes('cm')
   ) {
     matchedTopic = TOPIC_KNOWLEDGE_BASE.cm_tamilnadu;
   } else if (
@@ -428,6 +316,7 @@ export default function GoogleSearchCard({ media, onClose }) {
       .trim();
 
     matchedTopic = {
+      type: 'ai_overview',
       title: cleaned || currentQuery,
       topicName: cleaned || currentQuery,
       languageBadge: 'English',
@@ -461,13 +350,6 @@ export default function GoogleSearchCard({ media, onClose }) {
           title: `${cleaned} - Wikipedia`,
           url: `https://en.wikipedia.org/wiki/${encodeURIComponent(cleaned)}`,
           iconType: 'wikipedia'
-        },
-        {
-          name: 'Web Source',
-          domain: 'google.com',
-          title: `Discussion & Context on ${cleaned}`,
-          url: googleUrl,
-          iconType: 'quora'
         }
       ],
       organicResults: []
@@ -482,7 +364,12 @@ export default function GoogleSearchCard({ media, onClose }) {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     } else {
-      const plainText = `${matchedTopic.overviewLead.replace(/\*\*/g, '')}. ${matchedTopic.bulletPoints.map(b => `${b.label}: ${b.text}`).join('. ')}`;
+      let plainText = '';
+      if (matchedTopic.type === 'direct_answer') {
+        plainText = `${matchedTopic.headlineName}, ${matchedTopic.subText}. ${matchedTopic.wikipedia?.snippet || ''}`;
+      } else {
+        plainText = `${matchedTopic.overviewLead.replace(/\*\*/g, '')}. ${matchedTopic.bulletPoints.map(b => `${b.label}: ${b.text}`).join('. ')}`;
+      }
       const utterance = new SpeechSynthesisUtterance(plainText);
       utterance.rate = 1.0;
       utterance.onend = () => setIsSpeaking(false);
@@ -504,22 +391,6 @@ export default function GoogleSearchCard({ media, onClose }) {
       return part;
     });
   };
-
-  // Organic search results to show (matches query or live results)
-  const displayOrganicResults =
-    matchedTopic.organicResults && matchedTopic.organicResults.length > 0
-      ? matchedTopic.organicResults
-      : results && results.length > 0
-        ? results.map(r => ({
-            domain: r.displayUrl || r.url,
-            siteName: r.displayUrl ? r.displayUrl.split('/')[0] : 'Web Source',
-            title: r.title || `${currentQuery} - Overview`,
-            url: r.url,
-            meta: 'Verified Search',
-            snippet: r.snippet,
-            iconType: 'globe'
-          }))
-        : [];
 
   return (
     <div
@@ -625,11 +496,10 @@ export default function GoogleSearchCard({ media, onClose }) {
               { name: 'AI Mode', icon: '✦', isSpecial: true },
               { name: 'All' },
               { name: 'Images' },
-              { name: 'Videos' },
-              { name: 'Shopping' },
-              { name: 'Forums' },
-              { name: 'Short videos' },
               { name: 'News' },
+              { name: 'Videos' },
+              { name: 'Forums' },
+              { name: 'Shopping' },
               { name: 'More', isDropdown: true },
               { name: 'Tools', isDropdown: true }
             ].map((tab) => (
@@ -638,7 +508,7 @@ export default function GoogleSearchCard({ media, onClose }) {
                 onClick={() => setActiveTab(tab.name)}
                 className={`pb-2.5 font-medium transition flex items-center gap-1.5 whitespace-nowrap text-xs ${
                   activeTab === tab.name
-                    ? 'text-[#8ab4f8] border-b-[3px] border-[#8ab4f8] font-semibold'
+                    ? 'text-white border-b-[3px] border-[#8ab4f8] font-semibold'
                     : 'border-b-[3px] border-transparent hover:text-[#e8eaed]'
                 }`}
               >
@@ -650,94 +520,168 @@ export default function GoogleSearchCard({ media, onClose }) {
           </div>
         )}
 
-        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
         {/* 3. MAIN RESULTS CONTAINER */}
-        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
         {!isMinimized && (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-7 bg-[#202124] scrollbar-thin scrollbar-thumb-slate-700 flex flex-col gap-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-7 bg-[#202124] scrollbar-thin scrollbar-thumb-slate-700 flex flex-col gap-5">
             
-            {/* Search metadata */}
-            <div className="text-[12px] text-[#9aa0a6] select-none flex items-center justify-between flex-wrap gap-2">
-              <div>About 4,820,000 results (0.42 seconds)</div>
-              <div className="text-slate-400 text-[11px] flex items-center gap-1">
-                <span>📍 Tamil Nadu</span>
-                <span className="text-slate-600">•</span>
-                <span className="text-[#8ab4f8] cursor-pointer hover:underline">Choose area</span>
-              </div>
-            </div>
+            {/* ═══════════════════════════════════════════════════════════ */}
+            {/* DIRECT ANSWER CARD (Exact match to media_1788805683348.png) */}
+            {/* ═══════════════════════════════════════════════════════════ */}
+            {matchedTopic.type === 'direct_answer' && (
+              <div className="flex flex-col gap-4 max-w-3xl">
+                
+                {/* Breadcrumb row */}
+                <div className="flex items-center justify-between text-xs text-[#bdc1c6]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm">🏛️</span>
+                    <span className="font-medium text-slate-200">{matchedTopic.breadcrumb}</span>
+                  </div>
+                  <span className="text-slate-400 cursor-pointer hover:text-white">⋮</span>
+                </div>
 
-            {/* ═══════════════════════════════════════════════════════════════ */}
-            {/* 4. AUTHENTIC GOOGLE AI OVERVIEW CARD */}
-            {/* ═══════════════════════════════════════════════════════════════ */}
-            <div className="bg-[#282a2d] border border-[#3c4043] rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col gap-4 relative overflow-hidden transition">
-              
-              {/* Header inside AI Overview */}
-              <div className="flex items-center justify-between gap-3 border-b border-[#3c4043]/60 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex items-center gap-1.5 text-sm sm:text-base font-semibold text-white tracking-wide">
-                    <span className="text-base sm:text-lg bg-gradient-to-r from-[#c58af9] to-[#8ab4f8] bg-clip-text text-transparent font-bold">✦</span>
-                    <span>AI Overview</span>
+                {/* Direct Answer Featured Card */}
+                <div className="bg-[#282a2d] border border-[#3c4043]/80 rounded-2xl p-6 shadow-xl flex flex-col gap-1.5">
+                  <h1 className="text-3xl sm:text-4xl font-normal text-white tracking-tight">
+                    {matchedTopic.headlineName}
+                  </h1>
+                  <span className="text-sm sm:text-base text-[#9aa0a6] font-normal">
+                    {matchedTopic.subText}
+                  </span>
+                </div>
+
+                {/* Wikipedia Result below Direct Answer Card */}
+                {matchedTopic.wikipedia && (
+                  <div className="flex flex-col gap-2 pt-2">
+                    <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
+                      <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
+                        W
+                      </div>
+                      <div className="flex flex-col truncate">
+                        <span className="font-medium text-slate-200 text-xs">{matchedTopic.wikipedia.siteName}</span>
+                        <span className="text-[11px] text-[#9aa0a6] truncate">{matchedTopic.wikipedia.domain}</span>
+                      </div>
+                      <span className="text-slate-400 ml-auto cursor-pointer">⋮</span>
+                    </div>
+
+                    <a
+                      href={matchedTopic.wikipedia.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-lg sm:text-xl font-medium text-[#8ab4f8] hover:underline flex items-center gap-1.5"
+                    >
+                      {matchedTopic.wikipedia.title}
+                      {matchedTopic.wikipedia.verified && (
+                        <span className="text-[#8ab4f8] text-sm" title="Verified">✔</span>
+                      )}
+                    </a>
+
+                    <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed">
+                      {matchedTopic.wikipedia.snippet}
+                    </p>
+
+                    {/* Sub-Pills */}
+                    {matchedTopic.wikipedia.pills && (
+                      <div className="flex items-center gap-2 pt-1 flex-wrap">
+                        {matchedTopic.wikipedia.pills.map((pill, pIdx) => (
+                          <span
+                            key={pIdx}
+                            className="bg-[#303134] hover:bg-[#3c4043] text-slate-300 text-xs px-3 py-1 rounded-full border border-slate-600/70 cursor-pointer select-none transition"
+                          >
+                            {pill}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Top Stories Section */}
+                {matchedTopic.topStories && matchedTopic.topStories.length > 0 && (
+                  <div className="pt-3 flex flex-col gap-2.5">
+                    <div className="flex items-center gap-1.5 text-sm font-semibold text-white">
+                      <span>Top stories</span>
+                      <span>📑</span>
+                    </div>
+                    {matchedTopic.topStories.map((story, sIdx) => (
+                      <a
+                        key={sIdx}
+                        href={story.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-3 bg-[#282a2d] hover:bg-[#303134] rounded-xl border border-[#3c4043] transition flex items-center justify-between gap-3 text-xs sm:text-sm text-slate-200 hover:text-[#8ab4f8]"
+                      >
+                        <span className="font-medium">{story.title}</span>
+                        <span className="text-slate-400 font-bold">›</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+              </div>
+            )}
+
+            {/* ═══════════════════════════════════════════════════════════ */}
+            {/* AI OVERVIEW CARD (Exact match to media_1788805001436.png) */}
+            {/* ═══════════════════════════════════════════════════════════ */}
+            {matchedTopic.type === 'ai_overview' && (
+              <div className="bg-[#282a2d] border border-[#3c4043] rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col gap-4 relative overflow-hidden transition">
+                
+                {/* Header inside AI Overview */}
+                <div className="flex items-center justify-between gap-3 border-b border-[#3c4043]/60 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-1.5 text-sm sm:text-base font-semibold text-white tracking-wide">
+                      <span className="text-base sm:text-lg bg-gradient-to-r from-[#c58af9] to-[#8ab4f8] bg-clip-text text-transparent font-bold">✦</span>
+                      <span>AI Overview</span>
+                    </div>
+
+                    {matchedTopic.languageBadge && (
+                      <span className="bg-[#303134] text-slate-200 text-[11px] font-medium px-2.5 py-0.5 rounded-full border border-slate-600 select-none">
+                        {matchedTopic.languageBadge}
+                      </span>
+                    )}
                   </div>
 
-                  {matchedTopic.languageBadge && (
-                    <span className="bg-[#303134] text-slate-200 text-[11px] font-medium px-2.5 py-0.5 rounded-full border border-slate-600 select-none">
-                      {matchedTopic.languageBadge}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={toggleSpeech}
+                      className={`p-1.5 rounded-full transition text-xs flex items-center gap-1 ${
+                        isSpeaking
+                          ? 'bg-[#8ab4f8] text-[#202124] font-bold animate-pulse'
+                          : 'bg-[#303134] hover:bg-[#3c4043] text-slate-300 hover:text-white'
+                      }`}
+                      title={isSpeaking ? "Stop speech" : "Listen to overview"}
+                    >
+                      <span>{isSpeaking ? '⏹' : '🔊'}</span>
+                    </button>
+                    <button className="text-slate-400 hover:text-white p-1 text-sm rounded-lg hover:bg-[#303134]">
+                      ⋮
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={toggleSpeech}
-                    className={`p-1.5 rounded-full transition text-xs flex items-center gap-1 ${
-                      isSpeaking
-                        ? 'bg-[#8ab4f8] text-[#202124] font-bold animate-pulse'
-                        : 'bg-[#303134] hover:bg-[#3c4043] text-slate-300 hover:text-white'
-                    }`}
-                    title={isSpeaking ? "Stop speech" : "Listen to overview"}
-                  >
-                    <span>{isSpeaking ? '⏹' : '🔊'}</span>
-                  </button>
-                  <button className="text-slate-400 hover:text-white p-1 text-sm rounded-lg hover:bg-[#303134]">
-                    ⋮
-                  </button>
-                </div>
-              </div>
-
-              {/* Body: Left Definition & Right Citations */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
-                
-                {/* Left: Summary + Etymology Bullets */}
-                <div className="md:col-span-8 flex flex-col gap-3.5">
+                {/* Body: Left Definition & Right Citations */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
                   
-                  {/* Highlighted Lead Paragraph */}
-                  <p className="text-sm sm:text-[15px] text-[#e8eaed] leading-relaxed">
-                    {renderFormattedText(matchedTopic.overviewLead)}
-                  </p>
+                  {/* Left: Summary + Etymology Bullets */}
+                  <div className="md:col-span-8 flex flex-col gap-3.5">
+                    
+                    {/* Highlighted Lead Paragraph */}
+                    <p className="text-sm sm:text-[15px] text-[#e8eaed] leading-relaxed">
+                      {renderFormattedText(matchedTopic.overviewLead)}
+                    </p>
 
-                  {/* Section Title */}
-                  {matchedTopic.etymologyHeader && (
-                    <h4 className="text-sm font-semibold text-white mt-1">
-                      {matchedTopic.etymologyHeader}
-                    </h4>
-                  )}
+                    {/* Section Title */}
+                    {matchedTopic.etymologyHeader && (
+                      <h4 className="text-sm font-semibold text-white mt-1">
+                        {matchedTopic.etymologyHeader}
+                      </h4>
+                    )}
 
-                  {/* Bullet points */}
-                  <ul className="flex flex-col gap-2.5 text-xs sm:text-[13.5px] text-[#bdc1c6] leading-relaxed list-none pl-0">
-                    {matchedTopic.bulletPoints.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-slate-400 font-bold text-sm leading-tight">•</span>
-                        <div>
-                          <strong className="text-white font-medium">{item.label}:</strong> {item.text}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* Extended items when "Show more" clicked */}
-                  {isExpanded && matchedTopic.expandedDetails && (
-                    <ul className="flex flex-col gap-2.5 text-xs sm:text-[13.5px] text-[#bdc1c6] leading-relaxed list-none pl-0 pt-2 border-t border-[#3c4043]/50 animate-in fade-in duration-200">
-                      {matchedTopic.expandedDetails.map((item, idx) => (
+                    {/* Bullet points */}
+                    <ul className="flex flex-col gap-2.5 text-xs sm:text-[13.5px] text-[#bdc1c6] leading-relaxed list-none pl-0">
+                      {matchedTopic.bulletPoints.map((item, idx) => (
                         <li key={idx} className="flex items-start gap-2">
                           <span className="text-slate-400 font-bold text-sm leading-tight">•</span>
                           <div>
@@ -746,138 +690,179 @@ export default function GoogleSearchCard({ media, onClose }) {
                         </li>
                       ))}
                     </ul>
-                  )}
 
-                  {/* Show more toggle button */}
-                  <div className="pt-2">
-                    <button
-                      onClick={() => setIsExpanded(!isExpanded)}
-                      className="bg-[#303134] hover:bg-[#3c4043] text-slate-200 hover:text-white px-3.5 py-1.5 rounded-full text-xs font-medium border border-slate-600 transition flex items-center gap-1.5"
-                    >
-                      <span>{isExpanded ? 'Show less' : 'Show more'}</span>
-                      <span className="text-[10px]">{isExpanded ? '▲' : '▼'}</span>
-                    </button>
-                  </div>
-                </div>
+                    {/* Extended items when "Show more" clicked */}
+                    {isExpanded && matchedTopic.expandedDetails && (
+                      <ul className="flex flex-col gap-2.5 text-xs sm:text-[13.5px] text-[#bdc1c6] leading-relaxed list-none pl-0 pt-2 border-t border-[#3c4043]/50 animate-in fade-in duration-200">
+                        {matchedTopic.expandedDetails.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-slate-400 font-bold text-sm leading-tight">•</span>
+                            <div>
+                              <strong className="text-white font-medium">{item.label}:</strong> {item.text}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
 
-                {/* Right: Topic Thumbnail & Source Cards */}
-                <div className="md:col-span-4 flex flex-col gap-3">
-                  
-                  {/* Photo Thumbnail */}
-                  {matchedTopic.image && (
-                    <div className="w-full aspect-[16/10] rounded-2xl overflow-hidden bg-black border border-slate-700/80 shadow-md relative group">
-                      <img
-                        src={matchedTopic.image}
-                        alt={matchedTopic.topicName}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                      />
-                      <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-sm text-[10px] text-slate-200 font-medium">
-                        {matchedTopic.topicName}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Source Citations */}
-                  <div className="flex flex-col gap-2">
-                    {matchedTopic.sources.map((src, idx) => (
-                      <a
-                        key={idx}
-                        href={src.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-[#202124] hover:bg-[#303134] p-2.5 rounded-xl border border-[#3c4043] transition flex items-center justify-between gap-2.5 group"
+                    {/* Show more toggle button */}
+                    <div className="pt-2">
+                      <button
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className="bg-[#303134] hover:bg-[#3c4043] text-slate-200 hover:text-white px-3.5 py-1.5 rounded-full text-xs font-medium border border-slate-600 transition flex items-center gap-1.5"
                       >
-                        <div className="flex items-center gap-2 overflow-hidden">
-                          {src.iconType === 'quora' ? (
-                            <div className="w-5 h-5 rounded-full bg-[#b92b27] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
-                              Q
-                            </div>
-                          ) : src.iconType === 'wikipedia' ? (
-                            <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
-                              W
-                            </div>
-                          ) : (
-                            <div className="w-5 h-5 rounded-full bg-[#8ab4f8] flex items-center justify-center text-[10px] font-bold text-[#202124] flex-shrink-0">
-                              ✦
-                            </div>
-                          )}
-                          <div className="flex flex-col truncate">
-                            <span className="text-[11px] font-medium text-slate-300 group-hover:text-[#8ab4f8] truncate">
-                              {src.title}
-                            </span>
-                            <span className="text-[10px] text-slate-500 truncate">
-                              {src.domain}
-                            </span>
-                          </div>
-                        </div>
-                        <span className="text-slate-500 group-hover:text-slate-300 text-xs">↗</span>
-                      </a>
-                    ))}
+                        <span>{isExpanded ? 'Show less' : 'Show more'}</span>
+                        <span className="text-[10px]">{isExpanded ? '▲' : '▼'}</span>
+                      </button>
+                    </div>
                   </div>
 
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* ═══════════════════════════════════════════════════════════════ */}
-            {/* 5. ORGANIC WEB RESULTS (Matches exact query) */}
-            {/* ═══════════════════════════════════════════════════════════════ */}
-            <div className="flex flex-col gap-6 pt-2">
-              
-              {displayOrganicResults.map((item, idx) => (
-                <div key={idx} className="flex flex-col gap-1.5 group max-w-3xl">
-                  <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
-                    {item.iconType === 'quora' ? (
-                      <div className="w-5 h-5 rounded-full bg-[#b92b27] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
-                        Q
-                      </div>
-                    ) : item.iconType === 'wikipedia' ? (
-                      <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
-                        W
-                      </div>
-                    ) : (
-                      <div className="w-5 h-5 rounded-full bg-[#303134] border border-slate-600 flex items-center justify-center text-[10px] font-bold text-[#8ab4f8] flex-shrink-0">
-                        🌐
+                  {/* Right: Topic Thumbnail & Source Cards */}
+                  <div className="md:col-span-4 flex flex-col gap-3">
+                    
+                    {/* Photo Thumbnail */}
+                    {matchedTopic.image && (
+                      <div className="w-full aspect-[16/10] rounded-2xl overflow-hidden bg-black border border-slate-700/80 shadow-md relative group">
+                        <img
+                          src={matchedTopic.image}
+                          alt={matchedTopic.topicName}
+                          className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        />
+                        <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-sm text-[10px] text-slate-200 font-medium">
+                          {matchedTopic.topicName}
+                        </div>
                       </div>
                     )}
-                    <div className="flex flex-col truncate">
-                      <span className="font-medium text-slate-200 text-xs">{item.siteName}</span>
-                      <span className="text-[11px] text-[#9aa0a6] truncate">{item.domain}</span>
+
+                    {/* Source Citations */}
+                    <div className="flex flex-col gap-2">
+                      {matchedTopic.sources.map((src, idx) => (
+                        <a
+                          key={idx}
+                          href={src.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-[#202124] hover:bg-[#303134] p-2.5 rounded-xl border border-[#3c4043] transition flex items-center justify-between gap-2.5 group"
+                        >
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            {src.iconType === 'quora' ? (
+                              <div className="w-5 h-5 rounded-full bg-[#b92b27] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
+                                Q
+                              </div>
+                            ) : src.iconType === 'wikipedia' ? (
+                              <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
+                                W
+                              </div>
+                            ) : (
+                              <div className="w-5 h-5 rounded-full bg-[#8ab4f8] flex items-center justify-center text-[10px] font-bold text-[#202124] flex-shrink-0">
+                                ✦
+                              </div>
+                            )}
+                            <div className="flex flex-col truncate">
+                              <span className="text-[11px] font-medium text-slate-300 group-hover:text-[#8ab4f8] truncate">
+                                {src.title}
+                              </span>
+                              <span className="text-[10px] text-slate-500 truncate">
+                                {src.domain}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-slate-500 group-hover:text-slate-300 text-xs">↗</span>
+                        </a>
+                      ))}
                     </div>
+
                   </div>
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-base sm:text-lg font-medium text-[#8ab4f8] group-hover:underline leading-snug"
-                  >
-                    {item.title}
-                  </a>
-                  {item.meta && (
-                    <div className="text-[11px] text-slate-400 font-medium">
-                      {item.meta}
-                    </div>
-                  )}
-                  <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed">
-                    {item.snippet}
-                  </p>
+
                 </div>
-              ))}
 
-              {/* View all on Google button */}
-              <div className="pt-4 pb-2">
-                <a
-                  href={googleUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#303134] hover:bg-[#3c4043] text-[#8ab4f8] hover:text-white font-medium text-xs rounded-full border border-slate-600 transition shadow"
-                >
-                  <span>🔍</span> View more results for "{currentQuery}" on Google.com ↗
-                </a>
               </div>
+            )}
 
+            {/* ═══════════════════════════════════════════════════════════ */}
+            {/* ORGANIC SEARCH RESULTS (For AI Overview queries) */}
+            {/* ═══════════════════════════════════════════════════════════ */}
+            {matchedTopic.type === 'ai_overview' && (
+              <div className="flex flex-col gap-6 pt-2">
+                {matchedTopic.organicResults && matchedTopic.organicResults.length > 0 ? (
+                  matchedTopic.organicResults.map((item, idx) => (
+                    <div key={idx} className="flex flex-col gap-1.5 group max-w-3xl">
+                      <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
+                        {item.iconType === 'quora' ? (
+                          <div className="w-5 h-5 rounded-full bg-[#b92b27] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
+                            Q
+                          </div>
+                        ) : item.iconType === 'wikipedia' ? (
+                          <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
+                            W
+                          </div>
+                        ) : (
+                          <div className="w-5 h-5 rounded-full bg-[#303134] border border-slate-600 flex items-center justify-center text-[10px] font-bold text-[#8ab4f8] flex-shrink-0">
+                            🌐
+                          </div>
+                        )}
+                        <div className="flex flex-col truncate">
+                          <span className="font-medium text-slate-200 text-xs">{item.siteName}</span>
+                          <span className="text-[11px] text-[#9aa0a6] truncate">{item.domain}</span>
+                        </div>
+                      </div>
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-base sm:text-lg font-medium text-[#8ab4f8] group-hover:underline leading-snug"
+                      >
+                        {item.title}
+                      </a>
+                      {item.meta && (
+                        <div className="text-[11px] text-slate-400 font-medium">
+                          {item.meta}
+                        </div>
+                      )}
+                      <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed">
+                        {item.snippet}
+                      </p>
+                    </div>
+                  ))
+                ) : results && results.length > 0 ? (
+                  results.map((res, idx) => (
+                    <div key={idx} className="flex flex-col gap-1.5 group max-w-3xl">
+                      <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
+                        <div className="w-5 h-5 rounded-full bg-[#303134] border border-slate-600 flex items-center justify-center text-[10px] font-bold text-[#8ab4f8] flex-shrink-0">
+                          🌐
+                        </div>
+                        <div className="flex flex-col truncate">
+                          <span className="font-medium text-slate-200 text-xs">{res.displayUrl || 'Web Result'}</span>
+                          <span className="text-[11px] text-[#9aa0a6] truncate">{res.url}</span>
+                        </div>
+                      </div>
+                      <a
+                        href={res.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-base sm:text-lg font-medium text-[#8ab4f8] group-hover:underline leading-snug"
+                      >
+                        {res.title || `${currentQuery} - Overview`}
+                      </a>
+                      <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed line-clamp-2">
+                        {res.snippet}
+                      </p>
+                    </div>
+                  ))
+                ) : null}
+              </div>
+            )}
+
+            {/* View all on Google button */}
+            <div className="pt-3 pb-2">
+              <a
+                href={googleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#303134] hover:bg-[#3c4043] text-[#8ab4f8] hover:text-white font-medium text-xs rounded-full border border-slate-600 transition shadow"
+              >
+                <span>🔍</span> View more results for "{currentQuery}" on Google.com ↗
+              </a>
             </div>
 
           </div>
