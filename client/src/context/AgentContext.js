@@ -95,10 +95,14 @@ export const AgentProvider = ({ children }) => {
 
         if (lower.includes('youtube') || lower.includes('song') || lower.includes('play') || lower.includes('video') || lower.includes('music')) {
           let songQuery = text
-            .replace(/open\s+(?:your\s+)?youtube/gi, '')
+            .replace(/open\s+(?:a\s+)?(?:your\s+)?(?:the\s+)?youtube\s*(?:player)?/gi, '')
+            .replace(/open\s+(?:the\s+)?(?:youtube\s+)?player(?:\s+for)?/gi, '')
             .replace(/play\s+(?:on\s+youtube)?/gi, '')
             .replace(/open\s+and\s+play/gi, '')
+            .replace(/youtube\s+player/gi, '')
             .replace(/youtube/gi, '')
+            .replace(/player/gi, '')
+            .replace(/\s+/g, ' ')
             .trim();
 
           if (!songQuery) songQuery = 'top songs';

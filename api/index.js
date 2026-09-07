@@ -1,4 +1,4 @@
-﻿// Vercel Serverless Function API Handler
+// Vercel Serverless Function API Handler
 const inMemoryStore = {
   conversations: [
     { _id: 'conv-default-1', title: 'Welcome Session', updatedAt: new Date().toISOString() }
@@ -163,10 +163,14 @@ export default async function handler(req, res) {
     // Intent Recognition & Tool Triggering
     if (lower.includes('youtube') || lower.includes('song') || lower.includes('play') || lower.includes('video') || lower.includes('music')) {
       let songQuery = userMessage
-        .replace(/open\s+(?:your\s+)?youtube/gi, '')
+        .replace(/open\s+(?:a\s+)?(?:your\s+)?(?:the\s+)?youtube\s*(?:player)?/gi, '')
+        .replace(/open\s+(?:the\s+)?(?:youtube\s+)?player(?:\s+for)?/gi, '')
         .replace(/play\s+(?:on\s+youtube)?/gi, '')
         .replace(/open\s+and\s+play/gi, '')
+        .replace(/youtube\s+player/gi, '')
         .replace(/youtube/gi, '')
+        .replace(/player/gi, '')
+        .replace(/\s+/g, ' ')
         .trim();
 
       if (!songQuery) songQuery = 'top songs';
