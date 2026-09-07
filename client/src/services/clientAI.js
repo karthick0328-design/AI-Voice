@@ -376,6 +376,8 @@ export class ClientAI {
       lower.startsWith('what is mean by') ||
       lower.startsWith('what is the meaning of') ||
       lower.startsWith('meaning of') ||
+      lower.startsWith('mean by') ||
+      lower.includes('mean by') ||
       lower.startsWith('who is') ||
       lower.startsWith('what is') ||
       lower.startsWith('tell me about') ||
@@ -394,13 +396,17 @@ export class ClientAI {
         .replace(/^(?:mean\s+by|the\s+meaning\s+of|meaning\s+of)\s+/gi, '')
         .trim();
 
-      let snippet = `Here are the search results and information for "${rawQuery}". Click below to explore live Google Search results.`;
+      let snippet = `Here are the search results and AI overview for "${rawQuery}".`;
       let searchResults = [];
 
       // Built-in intelligent meanings
       const lowerTopic = (coreTopic || rawQuery).toLowerCase();
-      if (lowerTopic.includes('karthik') || lowerTopic.includes('kartik')) {
+      if (lowerTopic.includes('murugan') || lowerTopic.includes('kartikeya') || lowerTopic.includes('skanda')) {
+        snippet = 'Lord Murugan means "the beautiful one," "youthful," or "godliness" in Tamil, and he is revered as the Hindu god of war, victory, wisdom, and courage.';
+      } else if (lowerTopic.includes('karthik') || lowerTopic.includes('kartik')) {
         snippet = 'Karthik (or Kartikeya) is an Indian name of Sanskrit origin meaning radiant, courageous, one who bestows courage, and is associated with Lord Murugan / Kartikeya.';
+      } else if (lowerTopic.includes('cockpit')) {
+        snippet = 'A cockpit or flight deck is the area, usually near the front of an aircraft or spacecraft, from which a pilot controls the vehicle.';
       } else {
         try {
           const sRes = await fetch(`/api/websearch?q=${encodeURIComponent(rawQuery)}`);

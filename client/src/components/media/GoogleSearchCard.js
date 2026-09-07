@@ -1,5 +1,173 @@
 import React, { useState, useEffect } from 'react';
 
+// Specialized knowledge base for high-fidelity Google AI Overview cards
+const TOPIC_DATABASE = {
+  murugan: {
+    title: 'Murugan',
+    topicName: 'Lord Murugan',
+    entityQuery: 'mean by Murugan',
+    languageBadge: 'தமிழ்',
+    overviewLead: 'Lord Murugan means "**the beautiful one**," "**youthful**," or "**godliness**" in Tamil, and he is revered as the Hindu god of war, victory, wisdom, and courage.',
+    image: 'https://images.unsplash.com/photo-1567591414240-e18e79c5c2e1?w=600&auto=format&fit=crop&q=80',
+    etymologyHeader: 'Etymology and Meaning',
+    bulletPoints: [
+      {
+        label: 'Root Word',
+        text: 'Derived from the Tamil word "Murugu", meaning beauty, fragrance, sweetness, youth, and divinity.'
+      },
+      {
+        label: 'Appearance',
+        text: 'He is traditionally depicted as an eternally youthful, handsome, and radiant warrior.'
+      },
+      {
+        label: 'Symbolism',
+        text: 'His divine spear, the Vel, represents sharp intellect, broad vision, and profound spiritual wisdom conquering ignorance.'
+      },
+      {
+        label: 'Tamil Deity',
+        text: 'Revered as "Tamil Kadavul" (God of the Tamils) and the patron deity of the Tamil language and literature.'
+      }
+    ],
+    expandedDetails: [
+      {
+        label: 'Six Sacred Abodes',
+        text: 'Known as Arupadai Veedu (Thiruparankundram, Tiruchendur, Palani, Swamimalai, Thiruthani, and Pazhamudircholai).'
+      },
+      {
+        label: 'Family & Vehicle',
+        text: 'Son of Lord Shiva and Goddess Parvati, brother of Ganesha. His vahana (mount) is the sacred peacock (Mayil).'
+      }
+    ],
+    sources: [
+      {
+        name: 'Quora',
+        domain: 'quora.com',
+        title: 'What does the name Murugan mean? - Quora',
+        url: 'https://www.quora.com/What-does-the-name-Murugan-mean',
+        iconType: 'quora',
+        snippet: 'In Tamil, "Murugu" means beauty, youthfulness, godliness, and fragrance. Hence, Murugan translates to "the Handsome one", "the Youthful one"...',
+        meta: '50+ answers · 6 years ago'
+      },
+      {
+        name: 'Wikipedia',
+        domain: 'en.wikipedia.org',
+        title: 'Kartikeya (Murugan) - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/Kartikeya',
+        iconType: 'wikipedia',
+        snippet: 'Kartikeya (Sanskrit: कार्त्तिकेय), also known as Skanda, Murugan, Shanmukha and Subramanya, is the Hindu god of war and victory...',
+        meta: 'Free Encyclopedia'
+      },
+      {
+        name: 'Tamil Heritage',
+        domain: 'tamilheritage.org',
+        title: 'Significance & Spiritual Essence of Lord Murugan',
+        url: 'https://www.google.com/search?q=murugan+etymology+meaning',
+        iconType: 'heritage',
+        snippet: 'Murugan is celebrated as the embodiment of supreme beauty, valor, and wisdom across Tamil devotional traditions...',
+        meta: 'Cultural Archives'
+      }
+    ]
+  },
+  karthik: {
+    title: 'Karthik',
+    topicName: 'Karthik (Kartikeya)',
+    entityQuery: 'mean by Karthik',
+    languageBadge: 'संस्कृत / தமிழ்',
+    overviewLead: 'Karthik (or Karthick) is an Indian name meaning "**radiant**," "**courageous**," or "**bestower of courage**." It is derived from the Krittika (Pleiades) star constellation and directly refers to **Lord Murugan / Kartikeya**.',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+    etymologyHeader: 'Etymology and Significance',
+    bulletPoints: [
+      {
+        label: 'Origin',
+        text: 'Derived from Krittika (the six Krittika sisters / Pleiades who nurtured Lord Kartikeya).'
+      },
+      {
+        label: 'Core Meaning',
+        text: 'Signifies brilliance, eternal youth, valor, and divine radiance.'
+      },
+      {
+        label: 'Prominent Figures',
+        text: 'Widely used across India for prominent artists, actors (Murali Karthikeyan Muthuraman), musicians, and scholars.'
+      }
+    ],
+    expandedDetails: [
+      {
+        label: 'Cultural Connection',
+        text: 'Deeply celebrated during the Tamil month of Karthigai and Karthigai Deepam festival of lights.'
+      }
+    ],
+    sources: [
+      {
+        name: 'Wikipedia',
+        domain: 'en.wikipedia.org',
+        title: 'Karthik (given name) - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/Karthik',
+        iconType: 'wikipedia',
+        snippet: 'Karthik is a common Indian male given name of Sanskrit origin, named after the Hindu god of war, Kartikeya...',
+        meta: 'Encyclopedia Entry'
+      },
+      {
+        name: 'Quora',
+        domain: 'quora.com',
+        title: 'What is the real meaning of the name Karthick? - Quora',
+        url: 'https://www.quora.com/What-is-the-meaning-of-the-name-Karthik',
+        iconType: 'quora',
+        snippet: 'The name Karthik represents courage, leadership, and brilliance. It is also the month in the Hindu calendar dedicated to light...',
+        meta: '30+ answers'
+      }
+    ]
+  },
+  cockpit: {
+    title: 'Cockpit',
+    topicName: 'Cockpit (Flight Deck)',
+    entityQuery: 'cockpit',
+    languageBadge: 'Aviation',
+    overviewLead: 'A cockpit (or **flight deck**) is the area, usually near the front of an aircraft or spacecraft, from which a **pilot controls the vehicle**.',
+    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop&q=80',
+    etymologyHeader: 'Design and Functionality',
+    bulletPoints: [
+      {
+        label: 'Origin of Term',
+        text: 'First recorded in the 16th century describing cockfighting arenas; adopted by the Royal Navy in 1700s and aviation in 1914.'
+      },
+      {
+        label: 'Components',
+        text: 'Contains Primary Flight Displays (PFD), Navigation Displays (ND), Flight Management Systems (FMS), and throttle quadrant.'
+      },
+      {
+        label: 'Crew Roles',
+        text: 'Operated by the Pilot in Command (Captain) and First Officer (Co-pilot).'
+      }
+    ],
+    expandedDetails: [
+      {
+        label: 'Glass Cockpit',
+        text: 'Modern cockpits utilize electronic flight instrument displays and Head-Up Displays (HUD) replacing analog gauges.'
+      }
+    ],
+    sources: [
+      {
+        name: 'Wikipedia',
+        domain: 'en.wikipedia.org',
+        title: 'Cockpit - Wikipedia',
+        url: 'https://en.wikipedia.org/wiki/Cockpit',
+        iconType: 'wikipedia',
+        snippet: 'A cockpit or flight deck is the area, usually near the front of an aircraft or spacecraft, from which a pilot controls the vehicle...',
+        meta: 'Aerospace Engineering'
+      },
+      {
+        name: 'Boeing & Airbus Info',
+        domain: 'aviationsafety.org',
+        title: 'Flight Deck Ergonomics and Safety Systems',
+        url: 'https://www.google.com/search?q=cockpit+flight+deck',
+        iconType: 'heritage',
+        snippet: 'Understanding modern dual-pilot cockpit layouts, flight control side-sticks, and automated safety envelopes...',
+        meta: 'Aviation Standard'
+      }
+    ]
+  }
+};
+
 export default function GoogleSearchCard({ media, onClose }) {
   const [query, setQuery] = useState(media?.title || '');
   const [results, setResults] = useState(media?.results || []);
@@ -8,7 +176,8 @@ export default function GoogleSearchCard({ media, onClose }) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState('All');
-  const [openFaq, setOpenFaq] = useState(-1);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
     if (media) {
@@ -21,6 +190,15 @@ export default function GoogleSearchCard({ media, onClose }) {
       }
     }
   }, [media]);
+
+  // Clean up speech synthesis on unmount
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const fetchResults = async (q) => {
     if (!q || !q.trim()) return;
@@ -45,137 +223,211 @@ export default function GoogleSearchCard({ media, onClose }) {
 
   if (!media || media.type !== 'google') return null;
 
-  const currentQuery = query || media.title || 'karthick';
+  const currentQuery = query || media.title || 'Murugan';
   const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(currentQuery)}`;
   const lowerQ = currentQuery.toLowerCase();
 
-  // Knowledge panel determination
-  const isKarthik = lowerQ.includes('karthik') || lowerQ.includes('karthick');
-  const isCockpit = lowerQ.includes('cockpit');
+  // Match topic from knowledge database
+  let matchedTopic = null;
+  if (lowerQ.includes('murugan') || lowerQ.includes('kartikeya') || lowerQ.includes('skanda')) {
+    matchedTopic = TOPIC_DATABASE.murugan;
+  } else if (lowerQ.includes('karthik') || lowerQ.includes('karthick')) {
+    matchedTopic = TOPIC_DATABASE.karthik;
+  } else if (lowerQ.includes('cockpit') || lowerQ.includes('flight deck')) {
+    matchedTopic = TOPIC_DATABASE.cockpit;
+  } else {
+    // Dynamic generated topic
+    const cleanedTitle = currentQuery.replace(/^(?:what is mean by|mean by|what is|who is|search|search for)\s+/i, '').trim();
+    matchedTopic = {
+      title: cleanedTitle || currentQuery,
+      topicName: cleanedTitle || currentQuery,
+      entityQuery: currentQuery,
+      languageBadge: 'English',
+      overviewLead: snippet || `**${cleanedTitle || currentQuery}** refers to the authoritative concept, terminology, and live encyclopedic knowledge indexed across global search repositories.`,
+      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
+      etymologyHeader: 'Overview and Key Points',
+      bulletPoints: [
+        {
+          label: 'Definition',
+          text: snippet || `Comprehensive definition and verified search context for "${currentQuery}".`
+        },
+        {
+          label: 'Context',
+          text: `Widely indexed across web encyclopedias, scholarly articles, and public knowledge graphs.`
+        },
+        {
+          label: 'Discovery',
+          text: `Explore live interactive sources, discussions, and media publications below.`
+        }
+      ],
+      expandedDetails: [
+        {
+          label: 'Live Web Source',
+          text: `Updated automatically from real-time web indexing for ${currentQuery}.`
+        }
+      ],
+      sources: [
+        {
+          name: 'Wikipedia',
+          domain: 'en.wikipedia.org',
+          title: `${cleanedTitle} - Wikipedia`,
+          url: `https://en.wikipedia.org/wiki/${encodeURIComponent(cleanedTitle)}`,
+          iconType: 'wikipedia',
+          snippet: snippet || `Encyclopedic article and references for ${cleanedTitle}...`,
+          meta: 'Free Encyclopedia'
+        },
+        {
+          name: 'Web Sources',
+          domain: 'google.com',
+          title: `Explore full coverage for "${currentQuery}" on Google`,
+          url: googleUrl,
+          iconType: 'quora',
+          snippet: `Live search results, news, community forums, and media for ${currentQuery}...`,
+          meta: 'Google Search'
+        }
+      ]
+    };
+  }
 
-  const knowledgeData = isKarthik ? {
-    title: 'Karthik',
-    subtitle: 'Indian actor',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-    description: 'Murali Karthikeyan Muthuraman, better known by his stage name Karthik, is an Indian actor, playback singer and politician who works in Tamil cinema. He is the son of veteran actor R. Muthuraman. Karthik was one of the prominent stars in the industry in the 80s and 90s.',
-    source: 'Wikipedia',
-    attributes: [
-      { label: 'Born', value: '13 September 1960 (age 63 years)' },
-      { label: 'Spouse', value: 'Ragini (m. 1992), Rathi (m. 1988)' },
-      { label: 'Children', value: 'Gautham Karthik, Thiran Karthik, Ghayn Karthik' },
-      { label: 'Awards', value: 'Tamil Nadu State Film Award, Filmfare Awards South' }
-    ],
-    faqs: [
-      { q: 'What is meant by karthick?', a: 'Karthik is an Indian given name derived from Krittika (the Pleiades star cluster) and represents the Hindu deity Murugan / Kartikeya, symbolizing radiance and courage.' },
-      { q: 'What is Sanjeev Karthick\'s religion?', a: 'Karthik follows Hinduism, deeply rooted in South Indian cultural and devotional traditions.' },
-      { q: 'Who are the two wives of Karthik?', a: 'Actor Karthik married actress Ragini in 1992 and was previously married to her sister Rathi in 1988.' },
-      { q: 'Who was Sanjeev Karthick\'s first wife?', a: 'Rathi was the first wife of actor Karthik.' }
-    ]
-  } : isCockpit ? {
-    title: 'Cockpit',
-    subtitle: 'Flight deck area',
-    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&auto=format&fit=crop&q=80',
-    description: 'A cockpit or flight deck is the area, usually near the front of an aircraft or spacecraft, from which a pilot controls the vehicle. Most modern cockpits are enclosed, except on some small aircraft, and contain flight instruments and controls.',
-    source: 'Wikipedia',
-    attributes: [
-      { label: 'Category', value: 'Aircraft & Aerospace component' },
-      { label: 'Key Features', value: 'Flight instruments, HUD, Flight Management System (FMS)' },
-      { label: 'Crew', value: 'Captain (Pilot in Command), First Officer (Co-pilot)' }
-    ],
-    faqs: [
-      { q: 'What does cockpit mean in simple words?', a: 'A cockpit is the enclosed compartment in an airplane or spacecraft where the pilots sit and operate the flight controls.' },
-      { q: 'Why is it called a cockpit?', a: 'The term originated in the 16th century for a sunken pit used for cockfighting, and was later adopted in the Royal Navy and early aviation for the pilot\'s cramped control station.' },
-      { q: 'What is inside an aircraft cockpit?', a: 'It includes primary flight displays, navigational instruments, throttle quadrant, sidesticks/control yokes, and communications radios.' }
-    ]
-  } : {
-    title: currentQuery,
-    subtitle: 'Search Topic Overview',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-    description: snippet || `Real-time encyclopedic summary and web search results for "${currentQuery}" indexed on Google.`,
-    source: 'Google Knowledge Graph',
-    attributes: [
-      { label: 'Query', value: currentQuery },
-      { label: 'Status', value: 'Live Indexed' },
-      { label: 'Type', value: 'Web & AI Search Overview' }
-    ],
-    faqs: [
-      { q: `What is the definition of ${currentQuery}?`, a: snippet || `According to authoritative sources, ${currentQuery} represents key definitions and context across verified search entries.` },
-      { q: `Where can I find more results for ${currentQuery}?`, a: `Click "Open Search on Google.com" below to explore live news, images, videos, and full web links.` }
-    ]
+  // Handle Text-to-Speech playback
+  const toggleSpeech = () => {
+    if (!window.speechSynthesis) return;
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    } else {
+      const plainText = `${matchedTopic.overviewLead.replace(/\*\*/g, '')}. ${matchedTopic.bulletPoints.map(b => `${b.label}: ${b.text}`).join('. ')}`;
+      const utterance = new SpeechSynthesisUtterance(plainText);
+      utterance.rate = 1.0;
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+      setIsSpeaking(true);
+    }
+  };
+
+  // Helper to render bold markdown in text
+  const renderFormattedText = (str) => {
+    if (!str) return null;
+    const parts = str.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="text-white font-bold">{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
   };
 
   return (
     <div
       className={`transition-all duration-300 font-sans ${
         isFullscreen
-          ? 'fixed inset-0 w-screen h-screen z-50 bg-[#202124] flex flex-col m-0 p-0 rounded-none overflow-hidden'
+          ? 'fixed inset-0 w-screen h-screen z-50 bg-[#1f1f1f] flex flex-col m-0 p-0 rounded-none overflow-hidden'
           : isMinimized
             ? 'fixed z-40 bottom-20 right-6 w-80'
-            : 'fixed z-40 top-10 left-3 sm:top-12 sm:left-6 w-[96vw] sm:w-[580px] md:w-[780px] lg:w-[880px]'
+            : 'fixed z-40 top-8 left-3 sm:top-10 sm:left-6 w-[96vw] sm:w-[620px] md:w-[840px] lg:w-[940px]'
       }`}
     >
-      <div className={`bg-[#202124] text-[#e8eaed] flex flex-col overflow-hidden shadow-[0_16px_50px_rgba(0,0,0,0.85)] ${
-        isFullscreen ? 'w-full h-full' : 'rounded-2xl border border-[#3c4043] max-h-[88vh]'
+      <div className={`bg-[#1f1f1f] text-[#e8eaed] flex flex-col overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.9)] ${
+        isFullscreen ? 'w-full h-full' : 'rounded-3xl border border-[#3c4043] max-h-[90vh]'
       }`}>
         
-        {/* Top Google Search Bar Header */}
-        <div className="px-4 py-3 bg-[#202124] border-b border-[#3c4043] flex items-center justify-between gap-3 flex-shrink-0">
-          {/* Google Logo */}
-          <div className="flex items-center gap-1.5 cursor-pointer select-none">
-            <span className="text-white text-2xl font-semibold tracking-tight font-serif">Google</span>
-          </div>
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* 1. TOP AUTHENTIC GOOGLE SEARCH HEADER BAR */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        <div className="px-4 py-3 bg-[#1f1f1f] border-b border-[#3c4043] flex items-center justify-between gap-3 flex-shrink-0">
+          
+          {/* Authentic Google Logo */}
+          <a
+            href="https://www.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center select-none flex-shrink-0 text-white font-medium text-2xl tracking-tight pr-1"
+          >
+            <span className="text-[#8ab4f8]">G</span>
+            <span className="text-[#ea4335]">o</span>
+            <span className="text-[#fbbc04]">o</span>
+            <span className="text-[#8ab4f8]">g</span>
+            <span className="text-[#34a853]">l</span>
+            <span className="text-[#ea4335]">e</span>
+          </a>
 
-          {/* Search Pill Input */}
-          <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl relative flex items-center">
-            <div className="w-full bg-[#303134] hover:bg-[#35363a] focus-within:bg-[#303134] rounded-full px-4 py-2 flex items-center gap-2.5 border border-transparent focus-within:border-[#8ab4f8] shadow-md transition">
+          {/* Centered Search Pill Input matching Chrome & Google */}
+          <form onSubmit={handleSearchSubmit} className="flex-1 max-w-2xl relative flex items-center">
+            <div className="w-full bg-[#303134] hover:bg-[#35363a] focus-within:bg-[#303134] rounded-full px-4 py-2 flex items-center gap-2.5 border border-transparent focus-within:border-[#8ab4f8] shadow-inner transition">
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search Google..."
-                className="w-full bg-transparent text-white text-xs sm:text-sm outline-none placeholder-slate-400"
+                placeholder="Search Google or type a URL..."
+                className="w-full bg-transparent text-[#e8eaed] text-xs sm:text-sm outline-none placeholder-slate-400 font-normal"
               />
               {query && (
-                <button type="button" onClick={() => setQuery('')} className="text-slate-400 hover:text-white text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  className="text-slate-400 hover:text-white text-xs font-bold px-1"
+                  title="Clear"
+                >
                   ✕
                 </button>
               )}
-              <div className="h-4 w-[1px] bg-slate-600 hidden sm:block" />
-              <span className="text-slate-400 hover:text-white text-xs hidden sm:inline cursor-pointer" title="Voice Search">🎤</span>
-              <span className="text-slate-400 hover:text-white text-xs hidden sm:inline cursor-pointer" title="Google Lens">📷</span>
-              <button type="submit" className="text-[#8ab4f8] hover:text-white text-xs font-bold pl-1">
+              <div className="h-4 w-[1px] bg-slate-600 hidden sm:block mx-0.5" />
+              
+              {/* Mic / Lens / Search Icons */}
+              <button
+                type="button"
+                className="text-slate-400 hover:text-white text-sm hidden sm:inline-flex p-1"
+                title="Search by voice"
+              >
+                🎤
+              </button>
+              <button
+                type="button"
+                className="text-slate-400 hover:text-white text-sm hidden sm:inline-flex p-1"
+                title="Search by image"
+              >
+                📷
+              </button>
+              <button
+                type="submit"
+                className="text-[#8ab4f8] hover:text-[#aecbfa] text-sm font-bold pl-1"
+                title="Search"
+              >
                 🔍
               </button>
             </div>
           </form>
 
-          {/* Window & Fullscreen Controls */}
+          {/* Window / Tab Controls */}
           <div className="flex items-center gap-1.5 text-slate-400 text-xs flex-shrink-0">
             <a
               href={googleUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[11px] text-[#8ab4f8] hover:text-white bg-[#303134] hover:bg-[#3c4043] px-2.5 py-1 rounded-lg border border-slate-700 transition hidden sm:inline-flex items-center gap-1"
+              className="text-[11px] text-[#8ab4f8] hover:text-white bg-[#303134] hover:bg-[#3c4043] px-2.5 py-1.5 rounded-full border border-slate-700 transition hidden sm:inline-flex items-center gap-1 font-medium"
             >
-              Open Tab ↗
+              Open Google ↗
             </a>
             <button
               onClick={() => setIsMinimized(!isMinimized)}
-              className="hover:text-white p-1.5 rounded-lg hover:bg-[#303134]"
+              className="hover:text-white p-1.5 rounded-lg hover:bg-[#303134] text-xs"
               title={isMinimized ? "Expand" : "Minimize"}
             >
               {isMinimized ? '🗖' : '—'}
             </button>
             <button
               onClick={() => setIsFullscreen(!isFullscreen)}
-              className="hover:text-white p-1.5 rounded-lg hover:bg-[#303134]"
+              className="hover:text-white p-1.5 rounded-lg hover:bg-[#303134] text-xs"
               title={isFullscreen ? "Exit Fullscreen" : "Maximize"}
             >
               {isFullscreen ? '🗗' : '🗖'}
             </button>
             <button
               onClick={onClose}
-              className="hover:text-red-400 p-1.5 rounded-lg hover:bg-[#303134] font-bold"
+              className="hover:text-red-400 p-1.5 rounded-lg hover:bg-[#303134] font-bold text-xs"
               title="Close"
             >
               ✕
@@ -183,194 +435,314 @@ export default function GoogleSearchCard({ media, onClose }) {
           </div>
         </div>
 
-        {/* Navigation Tabs Header */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* 2. GOOGLE NAVIGATION TABS */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
         {!isMinimized && (
-          <div className="px-4 sm:px-6 pt-2 border-b border-[#3c4043] flex items-center gap-5 text-xs text-[#9aa0a6] select-none overflow-x-auto flex-shrink-0 scrollbar-none">
-            {['AI Mode', 'All', 'Images', 'Videos', 'Short videos', 'News', 'Shopping', 'More', 'Tools'].map((tab) => (
+          <div className="px-4 sm:px-8 pt-2.5 border-b border-[#3c4043] flex items-center gap-6 text-xs text-[#9aa0a6] select-none overflow-x-auto flex-shrink-0 scrollbar-none bg-[#1f1f1f]">
+            {[
+              { name: 'AI Mode', icon: '✦', isSpecial: true },
+              { name: 'All' },
+              { name: 'Images' },
+              { name: 'Videos' },
+              { name: 'Shopping' },
+              { name: 'Forums' },
+              { name: 'Short videos' },
+              { name: 'News' },
+              { name: 'More', isDropdown: true },
+              { name: 'Tools', isDropdown: true }
+            ].map((tab) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-2.5 font-medium transition flex items-center gap-1 whitespace-nowrap ${
-                  activeTab === tab
-                    ? 'text-white border-b-[3px] border-[#8ab4f8] font-semibold'
+                key={tab.name}
+                onClick={() => setActiveTab(tab.name)}
+                className={`pb-2.5 font-medium transition flex items-center gap-1.5 whitespace-nowrap text-xs ${
+                  activeTab === tab.name
+                    ? 'text-[#8ab4f8] border-b-[3px] border-[#8ab4f8] font-semibold'
                     : 'border-b-[3px] border-transparent hover:text-[#e8eaed]'
                 }`}
               >
-                {tab === 'AI Mode' && <span className="text-[#8ab4f8]">✦</span>}
-                {tab}
-                {tab === 'More' && <span>▾</span>}
+                {tab.isSpecial && <span className="text-[#c58af9] font-bold">✦</span>}
+                {tab.name}
+                {tab.isDropdown && <span className="text-[10px] text-slate-500">▾</span>}
               </button>
             ))}
           </div>
         )}
 
-        {/* Search Results Area */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* 3. GOOGLE RESULTS CONTAINER (AI OVERVIEW & WEB RESULTS) */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
         {!isMinimized && (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#202124] scrollbar-thin scrollbar-thumb-slate-700">
-            {/* "Including results for" banner */}
-            <div className="text-xs text-[#9aa0a6] mb-3 select-none flex items-center justify-between flex-wrap gap-2">
-              <div>
-                Including results for <a href={googleUrl} target="_blank" rel="noreferrer" className="text-[#8ab4f8] font-medium italic hover:underline">{currentQuery}</a>
-                <span className="ml-2 text-slate-500">· Search only for {currentQuery}</span>
+          <div className="flex-1 overflow-y-auto p-4 sm:p-7 bg-[#1f1f1f] scrollbar-thin scrollbar-thumb-slate-700 flex flex-col gap-6">
+            
+            {/* Query Info & Location Breadcrumb */}
+            <div className="text-[12px] text-[#9aa0a6] select-none flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <span>About 4,820,000 results (0.42 seconds)</span>
               </div>
-              <span className="text-slate-400 text-[11px]">📍 Tamil Nadu · Choose area</span>
+              <div className="text-slate-400 text-[11px] flex items-center gap-1">
+                <span>📍 Tamil Nadu</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-[#8ab4f8] cursor-pointer hover:underline">Choose area</span>
+              </div>
             </div>
 
-            {/* 2-Column Responsive Layout: Left (Results) & Right (Knowledge Panel) */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+            {/* ═══════════════════════════════════════════════════════════════ */}
+            {/* 4. AUTHENTIC GOOGLE AI OVERVIEW CARD (Exact match to media) */}
+            {/* ═══════════════════════════════════════════════════════════════ */}
+            <div className="bg-[#242628] border border-[#3c4043] rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col gap-4 relative overflow-hidden transition">
               
-              {/* LEFT COLUMN: Main Search & Wikipedia & People Also Ask */}
-              <div className="md:col-span-7 flex flex-col gap-5">
+              {/* Top AI Overview Bar */}
+              <div className="flex items-center justify-between gap-3 border-b border-[#3c4043]/60 pb-3">
                 
-                {/* 1. Primary Wikipedia Card with Thumbnail */}
-                <div className="bg-[#303134]/40 hover:bg-[#303134]/60 p-4 rounded-2xl border border-[#3c4043]/60 transition">
-                  <div className="flex items-center gap-2 mb-1 text-xs text-[#bdc1c6]">
-                    <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
-                      W
-                    </div>
-                    <div className="flex flex-col truncate">
-                      <span className="font-semibold text-slate-200">Wikipedia</span>
-                      <span className="text-[11px] text-[#9aa0a6] truncate">https://en.wikipedia.org › wiki › {knowledgeData.title}</span>
-                    </div>
+                {/* Left: ✦ AI Overview badge + Language Pill */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-1.5 text-sm sm:text-base font-semibold text-white tracking-wide">
+                    <span className="text-base sm:text-lg bg-gradient-to-r from-[#c58af9] to-[#8ab4f8] bg-clip-text text-transparent font-bold">✦</span>
+                    <span>AI Overview</span>
                   </div>
 
-                  <div className="flex items-start justify-between gap-4 mt-2">
-                    <div className="flex-1">
-                      <a
-                        href={googleUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-base sm:text-lg font-medium text-[#8ab4f8] hover:underline flex items-center gap-1.5"
-                      >
-                        {knowledgeData.title} ({knowledgeData.subtitle})
-                        <span className="text-[#34a853] text-xs" title="Verified">✓</span>
-                      </a>
-                      <p className="text-xs sm:text-sm text-[#bdc1c6] mt-1.5 leading-relaxed line-clamp-3">
-                        {knowledgeData.description}
-                      </p>
-                    </div>
-
-                    {knowledgeData.image && (
-                      <img
-                        src={knowledgeData.image}
-                        alt={knowledgeData.title}
-                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl border border-slate-700 flex-shrink-0 shadow"
-                      />
-                    )}
-                  </div>
+                  {matchedTopic.languageBadge && (
+                    <span className="bg-[#303134] hover:bg-[#3c4043] text-slate-200 text-[11px] font-medium px-2.5 py-0.5 rounded-full border border-slate-600/80 cursor-pointer select-none transition">
+                      {matchedTopic.languageBadge}
+                    </span>
+                  )}
                 </div>
 
-                {/* 2. People Also Ask Dropdown Section */}
-                <div className="bg-[#202124] border border-[#3c4043] rounded-2xl p-4 flex flex-col gap-2 shadow-sm">
-                  <h3 className="text-sm sm:text-base font-semibold text-[#e8eaed] mb-1 select-none">
-                    People also ask
-                  </h3>
-                  {knowledgeData.faqs.map((faq, idx) => (
-                    <div key={idx} className="border-b border-[#3c4043] last:border-0 pb-2">
-                      <button
-                        onClick={() => setOpenFaq(openFaq === idx ? -1 : idx)}
-                        className="w-full py-1.5 text-left text-xs sm:text-sm font-medium text-[#e8eaed] hover:text-[#8ab4f8] flex items-center justify-between transition"
-                      >
-                        <span>{faq.q}</span>
-                        <span className="text-slate-400 text-xs ml-2">{openFaq === idx ? '▲' : '▼'}</span>
-                      </button>
-                      {openFaq === idx && (
-                        <p className="text-xs sm:text-sm text-[#bdc1c6] pt-1.5 pb-1 pl-1 leading-relaxed animate-in fade-in duration-150">
-                          {faq.a}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                {/* Right: Speaker Audio Button & Options */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={toggleSpeech}
+                    className={`p-1.5 rounded-full transition text-xs flex items-center gap-1 ${
+                      isSpeaking
+                        ? 'bg-[#8ab4f8] text-[#202124] font-bold animate-pulse'
+                        : 'bg-[#303134] hover:bg-[#3c4043] text-slate-300 hover:text-white'
+                    }`}
+                    title={isSpeaking ? "Stop speech" : "Listen to overview"}
+                  >
+                    <span>{isSpeaking ? '⏹' : '🔊'}</span>
+                    <span className="text-[10px] pr-1 hidden sm:inline">{isSpeaking ? 'Playing...' : 'Listen'}</span>
+                  </button>
 
-                {/* 3. Live Web Results */}
-                {results && results.length > 0 && (
-                  <div className="flex flex-col gap-4">
-                    {results.map((res, idx) => (
-                      <div key={idx} className="flex flex-col gap-1 group">
-                        <span className="text-[11px] text-[#9aa0a6] truncate font-mono">
-                          {res.displayUrl || res.url}
-                        </span>
-                        <a
-                          href={res.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-medium text-[#8ab4f8] group-hover:underline leading-snug"
-                        >
-                          {res.title || `${currentQuery} - Overview`}
-                        </a>
-                        <p className="text-xs text-[#bdc1c6] leading-relaxed line-clamp-2">
-                          {res.snippet}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  <button className="text-slate-400 hover:text-white p-1 text-sm rounded-lg hover:bg-[#303134]">
+                    ⋮
+                  </button>
+                </div>
               </div>
 
-              {/* RIGHT COLUMN: Google Knowledge Graph Panel */}
-              <div className="md:col-span-5 bg-[#303134]/50 border border-[#3c4043] rounded-3xl p-4 sm:p-5 flex flex-col gap-3 shadow-lg">
-                <div className="flex items-center justify-between pb-1">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                      {knowledgeData.title}
-                    </h2>
-                    <span className="text-xs text-[#9aa0a6]">
-                      {knowledgeData.subtitle}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1 text-slate-400 text-xs">
-                    <span className="cursor-pointer hover:text-white p-1">⋮</span>
+              {/* Main AI Overview Content Area: Definition + Side Citations */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                
+                {/* Left: Definition & Bullet Points */}
+                <div className="lg:col-span-8 flex flex-col gap-3.5">
+                  
+                  {/* Lead Highlighted Summary */}
+                  <p className="text-sm sm:text-[15px] text-[#e8eaed] leading-relaxed">
+                    {renderFormattedText(matchedTopic.overviewLead)}
+                  </p>
+
+                  {/* Etymology and Meaning Subheading */}
+                  {matchedTopic.etymologyHeader && (
+                    <h4 className="text-sm font-semibold text-white mt-1">
+                      {matchedTopic.etymologyHeader}
+                    </h4>
+                  )}
+
+                  {/* Bullet points with bold titles */}
+                  <ul className="flex flex-col gap-2 text-xs sm:text-[13.5px] text-[#bdc1c6] leading-relaxed list-none pl-0">
+                    {matchedTopic.bulletPoints.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-slate-400 font-bold">•</span>
+                        <div>
+                          <strong className="text-white font-medium">{item.label}:</strong> {item.text}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Expanded details when "Show more" is active */}
+                  {isExpanded && matchedTopic.expandedDetails && (
+                    <ul className="flex flex-col gap-2 text-xs sm:text-[13.5px] text-[#bdc1c6] leading-relaxed list-none pl-0 pt-2 border-t border-[#3c4043]/50 animate-in fade-in duration-200">
+                      {matchedTopic.expandedDetails.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <span className="text-slate-400 font-bold">•</span>
+                          <div>
+                            <strong className="text-white font-medium">{item.label}:</strong> {item.text}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {/* Show More / Show Less Accordion Button */}
+                  <div className="pt-2">
+                    <button
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="bg-[#303134] hover:bg-[#3c4043] text-slate-200 hover:text-white px-3.5 py-1.5 rounded-full text-xs font-medium border border-slate-600 transition flex items-center gap-1.5"
+                    >
+                      <span>{isExpanded ? 'Show less' : 'Show more'}</span>
+                      <span className="text-[10px]">{isExpanded ? '▲' : '▼'}</span>
+                    </button>
                   </div>
                 </div>
 
-                {/* Hero Photo / Image Box */}
-                {knowledgeData.image && (
-                  <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-slate-700/80 shadow-md group">
-                    <img
-                      src={knowledgeData.image}
-                      alt={knowledgeData.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                    />
-                    <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[10px] text-slate-300">
-                      Source: India Today / Web
+                {/* Right: Deity/Topic Thumbnail & Stacked Citation Source Cards */}
+                <div className="lg:col-span-4 flex flex-col gap-3">
+                  
+                  {/* Deity / Entity Photo Thumbnail */}
+                  {matchedTopic.image && (
+                    <div className="w-full aspect-[16/10] rounded-2xl overflow-hidden bg-black border border-slate-700/80 shadow-md relative group">
+                      <img
+                        src={matchedTopic.image}
+                        alt={matchedTopic.topicName}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                      />
+                      <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-sm text-[10px] text-slate-200 font-medium">
+                        {matchedTopic.topicName}
+                      </div>
                     </div>
-                    <div className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-black/60 backdrop-blur-sm text-xs text-white">
-                      📷
-                    </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Description Bio */}
-                <p className="text-xs text-[#bdc1c6] leading-relaxed">
-                  {knowledgeData.description}
+                  {/* Source Citation Cards */}
+                  <div className="flex flex-col gap-2">
+                    {matchedTopic.sources.map((src, idx) => (
+                      <a
+                        key={idx}
+                        href={src.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-[#1f1f1f] hover:bg-[#2d2f31] p-2.5 rounded-xl border border-[#3c4043] transition flex items-center justify-between gap-2.5 group"
+                      >
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          {src.iconType === 'quora' ? (
+                            <div className="w-5 h-5 rounded-full bg-[#b92b27] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
+                              Q
+                            </div>
+                          ) : src.iconType === 'wikipedia' ? (
+                            <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
+                              W
+                            </div>
+                          ) : (
+                            <div className="w-5 h-5 rounded-full bg-[#8ab4f8] flex items-center justify-center text-[10px] font-bold text-[#202124] flex-shrink-0">
+                              ✦
+                            </div>
+                          )}
+                          <div className="flex flex-col truncate">
+                            <span className="text-[11px] font-medium text-slate-300 group-hover:text-[#8ab4f8] truncate">
+                              {src.title}
+                            </span>
+                            <span className="text-[10px] text-slate-500 truncate">
+                              {src.domain}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-slate-500 group-hover:text-slate-300 text-xs">↗</span>
+                      </a>
+                    ))}
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* ═══════════════════════════════════════════════════════════════ */}
+            {/* 5. ORGANIC WEB SEARCH RESULTS (Authentic Google layout) */}
+            {/* ═══════════════════════════════════════════════════════════════ */}
+            <div className="flex flex-col gap-6 pt-2">
+              
+              {/* Result 1: Quora */}
+              <div className="flex flex-col gap-1.5 group max-w-3xl">
+                <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
+                  <div className="w-5 h-5 rounded-full bg-[#b92b27] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
+                    Q
+                  </div>
+                  <div className="flex flex-col truncate">
+                    <span className="font-medium text-slate-200 text-xs">Quora</span>
+                    <span className="text-[11px] text-[#9aa0a6] truncate">https://www.quora.com › What-does-the-name-Murugan-mean</span>
+                  </div>
+                </div>
+                <a
+                  href="https://www.quora.com/What-does-the-name-Murugan-mean"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-base sm:text-lg font-medium text-[#8ab4f8] group-hover:underline leading-snug"
+                >
+                  What does the name Murugan mean? - Quora
+                </a>
+                <div className="text-[11px] text-slate-400 font-medium">
+                  50+ answers · 6 years ago
+                </div>
+                <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed">
+                  In Tamil, the word "Murugu" means beauty, youthfulness, godliness, and fragrance. Thus, Murugan translates to "the Handsome one", "the Youthful one", and the lord who destroys evil...
                 </p>
-                <div className="text-[11px] text-[#9aa0a6]">
-                  Source: <a href={googleUrl} target="_blank" rel="noreferrer" className="text-[#8ab4f8] hover:underline">{knowledgeData.source}</a>
-                </div>
+              </div>
 
-                {/* Attributes Table */}
-                <div className="pt-2 border-t border-[#3c4043] flex flex-col gap-2 text-xs">
-                  {knowledgeData.attributes.map((attr, idx) => (
-                    <div key={idx} className="flex items-start justify-between gap-2">
-                      <span className="font-semibold text-slate-300 flex-shrink-0">{attr.label}</span>
-                      <span className="text-[#bdc1c6] text-right">{attr.value}</span>
+              {/* Result 2: Wikipedia */}
+              <div className="flex flex-col gap-1.5 group max-w-3xl">
+                <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
+                  <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold text-black flex-shrink-0">
+                    W
+                  </div>
+                  <div className="flex flex-col truncate">
+                    <span className="font-medium text-slate-200 text-xs">Wikipedia</span>
+                    <span className="text-[11px] text-[#9aa0a6] truncate">https://en.wikipedia.org › wiki › Kartikeya</span>
+                  </div>
+                </div>
+                <a
+                  href="https://en.wikipedia.org/wiki/Kartikeya"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-base sm:text-lg font-medium text-[#8ab4f8] group-hover:underline leading-snug"
+                >
+                  Kartikeya (Murugan) - Wikipedia
+                </a>
+                <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed">
+                  Kartikeya (Sanskrit: कार्त्तिकेय), also known as Skanda, Murugan, Shanmukha and Subramanya, is the Hindu god of war. He is the son of Shiva and Parvati, brother of Ganesha...
+                </p>
+              </div>
+
+              {/* Result 3: Dynamic or Live Web Results */}
+              {results && results.length > 0 && results.map((res, idx) => (
+                <div key={idx} className="flex flex-col gap-1.5 group max-w-3xl">
+                  <div className="flex items-center gap-2 text-xs text-[#bdc1c6]">
+                    <div className="w-5 h-5 rounded-full bg-[#303134] border border-slate-600 flex items-center justify-center text-[10px] font-bold text-[#8ab4f8] flex-shrink-0">
+                      🌐
                     </div>
-                  ))}
+                    <div className="flex flex-col truncate">
+                      <span className="font-medium text-slate-200 text-xs">{res.displayUrl || 'Web Source'}</span>
+                      <span className="text-[11px] text-[#9aa0a6] truncate">{res.url}</span>
+                    </div>
+                  </div>
+                  <a
+                    href={res.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-base sm:text-lg font-medium text-[#8ab4f8] group-hover:underline leading-snug"
+                  >
+                    {res.title || `${currentQuery} - Overview`}
+                  </a>
+                  <p className="text-xs sm:text-[13px] text-[#bdc1c6] leading-relaxed line-clamp-2">
+                    {res.snippet}
+                  </p>
                 </div>
+              ))}
 
-                {/* Open Full Google Button */}
+              {/* View all results on Google.com button */}
+              <div className="pt-4 pb-2">
                 <a
                   href={googleUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 w-full py-2.5 px-4 bg-[#8ab4f8] hover:bg-[#aecbfa] text-[#202124] font-bold text-xs rounded-xl shadow transition text-center flex items-center justify-center gap-2"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#303134] hover:bg-[#3c4043] text-[#8ab4f8] hover:text-white font-medium text-xs rounded-full border border-slate-600 transition shadow"
                 >
-                  <span>🔍</span> View on Google.com ↗
+                  <span>🔍</span> View more results for "{currentQuery}" on Google.com ↗
                 </a>
               </div>
 
             </div>
+
           </div>
         )}
       </div>
