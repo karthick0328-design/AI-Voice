@@ -7,10 +7,13 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
   const [currentVolume, setCurrentVolume] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
   const [videoId, setVideoId] = useState(media?.videoId || 'z5y8Clp_TdE');
-  const iframeRef = useRef(null);
+  const [isReady, setIsReady] = useState(false);
+  
+  const playerRef = useRef(null);
   const containerRef = useRef(null);
+  const playerDivId = useRef(`yt-player-${Math.random().toString(36).substring(2, 9)}`);
 
-  // Resolve videoId whenever media title changes
+  // 1. Resolve videoId when media changes
   useEffect(() => {
     if (!media) return;
     let isMounted = true;
@@ -18,7 +21,12 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
       setVideoId(media.videoId);
     } else {
       YouTubeService.resolveVideoId(media.title).then((id) => {
-        if (isMounted && id) setVideoId(id);
+        if (isMounted && id) {
+          setVideoId(id);
+          if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
+            playerRef.current.loadVideoById(id);
+          }
+        }
       });
     }
     return () => {
@@ -26,122 +34,171 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
     };
   }, [media]);
 
-  const sendCommand = (func, args = []) => {
-    try {
-      if (iframeRef.current && iframeRef.current.contentWindow) {
-        iframeRef.current.contentWindow.postMessage(
-          JSON.stringify({
-            event: 'command',
-            func,
-            args
-          }),
-          '*'
-        );
-      }
-    } catch (e) {
-      console.warn('YouTube postMessage error:', e);
-    }
-  };
-
-  // Handle incoming media actions
+  // 2. Initialize official YouTube IFrame Player
   useEffect(() => {
-    if (!lastAction) return;
+    let checkInterval = null;
+
+    const initPlayer = () => {
+      if (window.YT && window.YT.Player && document.getElementById(playerDivId.current)) {
+        try {
+          playerRef.current = new window.YT.Player(playerDivId.current, {
+            videoId: videoId,
+            playerVars: {
+              autoplay: 1,
+              enablejsapi: 1,
+              playsinline: 1,
+              rel: 0
+            },
+            events: {
+              onReady: (event) => {
+                setIsReady(true);
+                try {
+                  event.target.playVideo();
+                } catch (e) {}
+              },
+              onError: (e) => {
+                console.warn('[YT Player Error]:', e.data);
+              }
+            }
+          });
+          return true;
+        } catch (err) {
+          console.warn('[YT Player init error]:', err);
+        }
+      }
+      return false;
+    };
+
+    if (!initPlayer()) {
+      checkInterval = setInterval(() => {
+        if (initPlayer()) {
+          clearInterval(checkInterval);
+        }
+      }, 300);
+    }
+
+    return () => {
+      if (checkInterval) clearInterval(checkInterval);
+      if (playerRef.current && typeof playerRef.current.destroy === 'function') {
+        try {
+          playerRef.current.destroy();
+        } catch (e) {}
+      }
+    };
+  }, [videoId]);
+
+  // 3. Direct execution of all voice commands against player instance
+  useEffect(() => {
+    if (!lastAction || !playerRef.current) return;
 
     const executeAction = (actionObj) => {
+      const p = playerRef.current;
       const act = actionObj.action;
-      console.log('[YOUTUBE ACTION]', act, actionObj);
+      console.log('[EXECUTING YOUTUBE VOICE ACTION]:', act, actionObj);
 
-      switch (act) {
-        case 'play':
-        case 'resume':
-          sendCommand('playVideo');
-          break;
+      try {
+        switch (act) {
+          case 'pause':
+          case 'stop':
+            if (typeof p.pauseVideo === 'function') p.pauseVideo();
+            break;
 
-        case 'pause':
-        case 'stop':
-          sendCommand('pauseVideo');
-          break;
+          case 'play':
+          case 'resume':
+            if (typeof p.playVideo === 'function') p.playVideo();
+            break;
 
-        case 'restart':
-          sendCommand('seekTo', [0, true]);
-          sendCommand('playVideo');
-          break;
+          case 'restart':
+            if (typeof p.seekTo === 'function') p.seekTo(0, true);
+            if (typeof p.playVideo === 'function') p.playVideo();
+            break;
 
-        case 'mute':
-          sendCommand('mute');
-          setIsMuted(true);
-          break;
+          case 'mute':
+            if (typeof p.mute === 'function') p.mute();
+            setIsMuted(true);
+            break;
 
-        case 'unmute':
-          sendCommand('unMute');
-          setIsMuted(false);
-          break;
-
-        case 'set_volume':
-          if (typeof actionObj.volume === 'number') {
-            sendCommand('setVolume', [actionObj.volume]);
-            setCurrentVolume(actionObj.volume);
-            if (actionObj.volume > 0) {
-              sendCommand('unMute');
-              setIsMuted(false);
-            }
-          }
-          break;
-
-        case 'volume_up':
-          setCurrentVolume((prev) => {
-            const next = Math.min(100, prev + (actionObj.step || 15));
-            sendCommand('setVolume', [next]);
-            sendCommand('unMute');
+          case 'unmute':
+            if (typeof p.unMute === 'function') p.unMute();
             setIsMuted(false);
-            return next;
-          });
-          break;
+            break;
 
-        case 'volume_down':
-          setCurrentVolume((prev) => {
-            const next = Math.max(0, prev - (actionObj.step || 15));
-            sendCommand('setVolume', [next]);
-            return next;
-          });
-          break;
+          case 'set_volume':
+            if (typeof actionObj.volume === 'number' && typeof p.setVolume === 'function') {
+              p.setVolume(actionObj.volume);
+              setCurrentVolume(actionObj.volume);
+              if (actionObj.volume > 0 && typeof p.unMute === 'function') {
+                p.unMute();
+                setIsMuted(false);
+              }
+            }
+            break;
 
-        case 'seek_forward':
-          sendCommand('seekTo', [`+${actionObj.seconds || 10}`, true]);
-          break;
+          case 'volume_up':
+            if (typeof p.getVolume === 'function' && typeof p.setVolume === 'function') {
+              const current = p.getVolume();
+              const next = Math.min(100, current + (actionObj.step || 15));
+              p.setVolume(next);
+              if (typeof p.unMute === 'function') p.unMute();
+              setIsMuted(false);
+              setCurrentVolume(next);
+            }
+            break;
 
-        case 'seek_backward':
-          sendCommand('seekTo', [`-${actionObj.seconds || 10}`, true]);
-          break;
+          case 'volume_down':
+            if (typeof p.getVolume === 'function' && typeof p.setVolume === 'function') {
+              const current = p.getVolume();
+              const next = Math.max(0, current - (actionObj.step || 15));
+              p.setVolume(next);
+              setCurrentVolume(next);
+            }
+            break;
 
-        case 'seek_to':
-          if (typeof actionObj.seconds === 'number') {
-            sendCommand('seekTo', [actionObj.seconds, true]);
-          }
-          break;
+          case 'seek_forward':
+            if (typeof p.getCurrentTime === 'function' && typeof p.seekTo === 'function') {
+              const cur = p.getCurrentTime();
+              p.seekTo(cur + (actionObj.seconds || 10), true);
+            }
+            break;
 
-        case 'set_playback_rate':
-          if (actionObj.rate) {
-            sendCommand('setPlaybackRate', [actionObj.rate]);
-          }
-          break;
+          case 'seek_backward':
+            if (typeof p.getCurrentTime === 'function' && typeof p.seekTo === 'function') {
+              const cur = p.getCurrentTime();
+              p.seekTo(Math.max(0, cur - (actionObj.seconds || 10)), true);
+            }
+            break;
 
-        case 'fullscreen':
-          if (containerRef.current && containerRef.current.requestFullscreen) {
-            containerRef.current.requestFullscreen().catch(() => {});
-            setIsFullscreen(true);
-          }
-          break;
+          case 'seek_to':
+            if (typeof actionObj.seconds === 'number' && typeof p.seekTo === 'function') {
+              p.seekTo(actionObj.seconds, true);
+            }
+            break;
 
-        case 'exit_fullscreen':
-          if (document.fullscreenElement && document.exitFullscreen) {
-            document.exitFullscreen().catch(() => {});
-            setIsFullscreen(false);
-          }
-          break;
+          case 'set_playback_rate':
+            if (actionObj.rate && typeof p.setPlaybackRate === 'function') {
+              p.setPlaybackRate(actionObj.rate);
+            }
+            break;
 
-        default:
-          break;
+          case 'fullscreen':
+            if (containerRef.current && containerRef.current.requestFullscreen) {
+              containerRef.current.requestFullscreen().catch(() => {});
+              setIsFullscreen(true);
+            }
+            break;
+
+          case 'exit_fullscreen':
+            if (document.fullscreenElement && document.exitFullscreen) {
+              document.exitFullscreen().catch(() => {});
+              setIsFullscreen(false);
+            }
+            break;
+
+          default:
+            break;
+        }
+      } catch (err) {
+        console.warn('[YT Action Execution Exception]:', err);
       }
     };
 
@@ -157,8 +214,6 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
   if (!media) return null;
 
   const searchQuery = encodeURIComponent(media.title || 'trending music');
-  // Official YouTube Embed with videoId, enablejsapi, autoplay, and playsinline
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1&playsinline=1`;
 
   return (
     <div
@@ -188,7 +243,7 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
 
           <div className="flex items-center gap-1.5">
             <a
-              href={`https://www.youtube.com/results?search_query=${searchQuery}`}
+              href={`https://www.youtube.com/watch?v=${videoId}`}
               target="_blank"
               rel="noreferrer"
               className="text-[11px] font-semibold text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 px-2.5 py-1 rounded-lg transition"
@@ -214,42 +269,41 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
         </div>
 
         {/* Video Frame */}
-        {!isMinimized && (
-          <div className="relative aspect-video w-full bg-black">
-            <iframe
-              ref={iframeRef}
-              id="youtube-agent-frame"
-              src={embedUrl}
-              title={`YouTube Player - ${media.title}`}
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
-          </div>
-        )}
+        <div className={`relative aspect-video w-full bg-black ${isMinimized ? 'hidden' : 'block'}`}>
+          <div id={playerDivId.current} className="w-full h-full" />
+        </div>
 
-        {/* Footer info & interactive controls */}
+        {/* Footer controls */}
         <div className="px-4 py-2.5 bg-slate-900/90 border-t border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
-              onClick={() => sendCommand('playVideo')}
+              onClick={() => {
+                if (playerRef.current && typeof playerRef.current.playVideo === 'function') {
+                  playerRef.current.playVideo();
+                }
+              }}
               className="px-2.5 py-1 bg-white/10 hover:bg-white/20 active:scale-95 rounded font-semibold text-white transition"
             >
               ▶ Play
             </button>
             <button
-              onClick={() => sendCommand('pauseVideo')}
+              onClick={() => {
+                if (playerRef.current && typeof playerRef.current.pauseVideo === 'function') {
+                  playerRef.current.pauseVideo();
+                }
+              }}
               className="px-2.5 py-1 bg-white/10 hover:bg-white/20 active:scale-95 rounded font-semibold text-white transition"
             >
               ⏸ Pause
             </button>
             <button
               onClick={() => {
+                if (!playerRef.current) return;
                 if (isMuted) {
-                  sendCommand('unMute');
+                  if (typeof playerRef.current.unMute === 'function') playerRef.current.unMute();
                   setIsMuted(false);
                 } else {
-                  sendCommand('mute');
+                  if (typeof playerRef.current.mute === 'function') playerRef.current.mute();
                   setIsMuted(true);
                 }
               }}

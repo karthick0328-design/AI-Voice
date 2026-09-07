@@ -12,10 +12,11 @@ export const AgentProvider = ({ children }) => {
   const [currentAnimation, setCurrentAnimation] = useState("idel Retarget.001");
   const [conversationId, setConversationId] = useState(null);
   const [avatarType, setAvatarType] = useState("boy");
-  const [activeMedia, setActiveMedia] = useState(null); // Embedded YouTube state
-  const [lastAction, setLastAction] = useState(null); // Last YouTube action object
+  const [activeMedia, setActiveMedia] = useState(null);
+  const [lastAction, setLastAction] = useState(null);
   const [subtitle, setSubtitle] = useState("");
   const [aiText, setAiText] = useState("");
+  const [isContinuousVoice, setIsContinuousVoice] = useState(true);
   
   const stateRef = useRef({
     isListening: false,
@@ -23,7 +24,8 @@ export const AgentProvider = ({ children }) => {
     conversationId: null,
     isProcessing: false,
     avatarType: "boy",
-    activeMedia: null
+    activeMedia: null,
+    isContinuousVoice: true
   });
 
   useEffect(() => { stateRef.current.isListening = isListening; }, [isListening]);
@@ -31,6 +33,7 @@ export const AgentProvider = ({ children }) => {
   useEffect(() => { stateRef.current.conversationId = conversationId; }, [conversationId]);
   useEffect(() => { stateRef.current.avatarType = avatarType; }, [avatarType]);
   useEffect(() => { stateRef.current.activeMedia = activeMedia; }, [activeMedia]);
+  useEffect(() => { stateRef.current.isContinuousVoice = isContinuousVoice; }, [isContinuousVoice]);
 
   const openTab = (url) => {
     try {
@@ -48,11 +51,25 @@ export const AgentProvider = ({ children }) => {
     } catch (e) {}
   };
 
+  const resumeListening = useCallback(() => {
+    if (!stateRef.current.isContinuousVoice) return;
+    setTimeout(() => {
+      if (!stateRef.current.isSpeaking && !stateRef.current.isProcessing && !stateRef.current.isListening) {
+        startListening();
+      }
+    }, 600);
+  }, []);
+
   const startSpeaking = useCallback((text, customAnimation = null) => {
     if (!text) {
       stateRef.current.isProcessing = false;
+      resumeListening();
       return;
     }
+    
+    // Stop microphone during TTS to avoid picking up assistant's own voice
+    speechService.stopListening();
+    setIsListening(false);
     
     const anim = customAnimation || "speaking";
     setCurrentAnimation(anim);
@@ -68,15 +85,17 @@ export const AgentProvider = ({ children }) => {
         stateRef.current.isSpeaking = false;
         setCurrentAnimation("idel Retarget.001");
         stateRef.current.isProcessing = false;
+        resumeListening();
       },
       onError: () => {
         setIsSpeaking(false);
         stateRef.current.isSpeaking = false;
         setCurrentAnimation("idel Retarget.001");
         stateRef.current.isProcessing = false;
+        resumeListening();
       }
     });
-  }, []);
+  }, [resumeListening]);
 
   const handleQuery = useCallback(async (queryText) => {
     if (!queryText || !queryText.trim()) return;
@@ -93,7 +112,6 @@ export const AgentProvider = ({ children }) => {
       const videoId = await YouTubeService.resolveVideoId(localResult.title);
       const watchUrl = `https://www.youtube.com/watch?v=${videoId}&autoplay=1`;
       
-      // Directly open the watch URL so YouTube actually starts playing!
       openTab(watchUrl);
 
       setActiveMedia({
@@ -126,6 +144,16 @@ export const AgentProvider = ({ children }) => {
       localResult.action !== 'wave'
     ) {
       setLastAction({ ...localResult, timestamp: Date.now() });
+
+      // Notify backend if running
+      try {
+        fetch('/api/youtube/control', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(localResult)
+        }).catch(() => {});
+      } catch (e) {}
+
       startSpeaking(localResult.response, 'speaking');
       return;
     }
@@ -191,6 +219,7 @@ export const AgentProvider = ({ children }) => {
       activeMedia, setActiveMedia,
       lastAction, setLastAction,
       subtitle, aiText,
+      isContinuousVoice, setIsContinuousVoice,
       handleQuery
     }}>
       {children}

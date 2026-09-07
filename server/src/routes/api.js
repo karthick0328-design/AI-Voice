@@ -73,6 +73,12 @@ router.get('/health', modelController.checkHealth);
 router.get('/settings', settingsController.getSettings);
 router.put('/settings', settingsController.updateSettings);
 
+// YouTube Search & Real-Time Player Control
+import * as youtubeController from '../controllers/youtubeController.js';
+router.get('/youtube/search', youtubeController.searchYouTube);
+router.post('/youtube/control', youtubeController.executeControl);
+router.get('/youtube/status', youtubeController.getStatus);
+
 // Tools info
 router.get('/tools', (req, res) => {
   res.json(toolRegistry.getAllTools().map(t => ({
@@ -84,3 +90,4 @@ router.get('/tools', (req, res) => {
 });
 
 export default router;
+
