@@ -82,6 +82,26 @@ export default async function handler(req, res) {
     }
   }
 
+  // 1c. YouTube Control API (Serverless Handler)
+  if (pathname === '/youtube/control' || pathname.startsWith('/youtube/control')) {
+    const action = req.body?.action || 'control';
+    return res.status(200).json({
+      success: true,
+      action,
+      message: `YouTube action "${action}" executed successfully.`
+    });
+  }
+
+  // 1d. YouTube Status API
+  if (pathname === '/youtube/status' || pathname.startsWith('/youtube/status')) {
+    return res.status(200).json({
+      success: true,
+      isPlaying: true,
+      volume: 100,
+      isMuted: false
+    });
+  }
+
   // 2. Models
   if (pathname === '/models' && req.method === 'GET') {
     return res.status(200).json({

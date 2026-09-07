@@ -6,25 +6,36 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentVolume, setCurrentVolume] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
-  const [videoId, setVideoId] = useState(media?.videoId || 'z5y8Clp_TdE');
+  const [videoId, setVideoId] = useState(media?.videoId || 'GoGl1pT0TSM');
+  const [activeTitle, setActiveTitle] = useState(media?.title || 'Trending Music');
   const [isReady, setIsReady] = useState(false);
   
   const playerRef = useRef(null);
   const containerRef = useRef(null);
+  const historyRef = useRef([]);
   const playerDivId = useRef(`yt-player-${Math.random().toString(36).substring(2, 9)}`);
 
-  // 1. Resolve videoId when media changes
+  // Sync title & video ID when media prop changes
   useEffect(() => {
     if (!media) return;
     let isMounted = true;
+    if (media.title) setActiveTitle(media.title);
+
     if (media.videoId) {
       setVideoId(media.videoId);
-    } else {
+      if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
+        try {
+          playerRef.current.loadVideoById(media.videoId);
+        } catch (e) {}
+      }
+    } else if (media.title) {
       YouTubeService.resolveVideoId(media.title).then((id) => {
         if (isMounted && id) {
           setVideoId(id);
           if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
-            playerRef.current.loadVideoById(id);
+            try {
+              playerRef.current.loadVideoById(id);
+            } catch (e) {}
           }
         }
       });
@@ -33,6 +44,19 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
       isMounted = false;
     };
   }, [media]);
+
+  // Handle browser fullscreen state change
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   // 2. Initialize official YouTube IFrame Player
   useEffect(() => {
@@ -91,7 +115,7 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
   useEffect(() => {
     if (!lastAction || !playerRef.current) return;
 
-    const executeAction = (actionObj) => {
+    const executeAction = async (actionObj) => {
       const p = playerRef.current;
       const act = actionObj.action;
       console.log('[EXECUTING YOUTUBE VOICE ACTION]:', act, actionObj);
@@ -113,6 +137,39 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
             if (typeof p.playVideo === 'function') p.playVideo();
             break;
 
+          case 'next':
+            if (videoId) {
+              historyRef.current.push({ id: videoId, title: activeTitle });
+            }
+            if (typeof p.nextVideo === 'function') {
+              try { p.nextVideo(); } catch (e) {}
+            }
+            const nextTrack = await YouTubeService.resolveNextVideo(videoId);
+            if (nextTrack && nextTrack.id) {
+              setVideoId(nextTrack.id);
+              setActiveTitle(nextTrack.title);
+              if (typeof p.loadVideoById === 'function') {
+                p.loadVideoById(nextTrack.id);
+              }
+            }
+            break;
+
+          case 'previous':
+            if (historyRef.current.length > 0) {
+              const prevTrack = historyRef.current.pop();
+              setVideoId(prevTrack.id);
+              setActiveTitle(prevTrack.title);
+              if (typeof p.loadVideoById === 'function') {
+                p.loadVideoById(prevTrack.id);
+              }
+            } else if (typeof p.previousVideo === 'function') {
+              try { p.previousVideo(); } catch (e) {}
+            } else if (typeof p.seekTo === 'function') {
+              p.seekTo(0, true);
+              if (typeof p.playVideo === 'function') p.playVideo();
+            }
+            break;
+
           case 'mute':
             if (typeof p.mute === 'function') p.mute();
             setIsMuted(true);
@@ -125,9 +182,10 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
 
           case 'set_volume':
             if (typeof actionObj.volume === 'number' && typeof p.setVolume === 'function') {
-              p.setVolume(actionObj.volume);
-              setCurrentVolume(actionObj.volume);
-              if (actionObj.volume > 0 && typeof p.unMute === 'function') {
+              const vol = Math.min(100, Math.max(0, actionObj.volume));
+              p.setVolume(vol);
+              setCurrentVolume(vol);
+              if (vol > 0 && typeof p.unMute === 'function') {
                 p.unMute();
                 setIsMuted(false);
               }
@@ -135,35 +193,35 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
             break;
 
           case 'volume_up':
-            if (typeof p.getVolume === 'function' && typeof p.setVolume === 'function') {
-              const current = p.getVolume();
-              const next = Math.min(100, current + (actionObj.step || 15));
-              p.setVolume(next);
+            {
+              const cur = (typeof p.getVolume === 'function') ? (p.getVolume() || currentVolume) : currentVolume;
+              const nextVol = Math.min(100, cur + (actionObj.step || 20));
+              if (typeof p.setVolume === 'function') p.setVolume(nextVol);
               if (typeof p.unMute === 'function') p.unMute();
               setIsMuted(false);
-              setCurrentVolume(next);
+              setCurrentVolume(nextVol);
             }
             break;
 
           case 'volume_down':
-            if (typeof p.getVolume === 'function' && typeof p.setVolume === 'function') {
-              const current = p.getVolume();
-              const next = Math.max(0, current - (actionObj.step || 15));
-              p.setVolume(next);
-              setCurrentVolume(next);
+            {
+              const cur = (typeof p.getVolume === 'function') ? (p.getVolume() || currentVolume) : currentVolume;
+              const nextVol = Math.max(0, cur - (actionObj.step || 20));
+              if (typeof p.setVolume === 'function') p.setVolume(nextVol);
+              setCurrentVolume(nextVol);
             }
             break;
 
           case 'seek_forward':
             if (typeof p.getCurrentTime === 'function' && typeof p.seekTo === 'function') {
-              const cur = p.getCurrentTime();
+              const cur = p.getCurrentTime() || 0;
               p.seekTo(cur + (actionObj.seconds || 10), true);
             }
             break;
 
           case 'seek_backward':
             if (typeof p.getCurrentTime === 'function' && typeof p.seekTo === 'function') {
-              const cur = p.getCurrentTime();
+              const cur = p.getCurrentTime() || 0;
               p.seekTo(Math.max(0, cur - (actionObj.seconds || 10)), true);
             }
             break;
@@ -181,16 +239,37 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
             break;
 
           case 'fullscreen':
-            if (containerRef.current && containerRef.current.requestFullscreen) {
-              containerRef.current.requestFullscreen().catch(() => {});
-              setIsFullscreen(true);
+            {
+              const elem = containerRef.current;
+              if (elem) {
+                if (elem.requestFullscreen) {
+                  elem.requestFullscreen().catch(() => {});
+                } else if (elem.webkitRequestFullscreen) {
+                  elem.webkitRequestFullscreen();
+                } else if (elem.mozRequestFullScreen) {
+                  elem.mozRequestFullScreen();
+                } else if (elem.msRequestFullscreen) {
+                  elem.msRequestFullscreen();
+                }
+                setIsFullscreen(true);
+              }
             }
             break;
 
           case 'exit_fullscreen':
-            if (document.fullscreenElement && document.exitFullscreen) {
-              document.exitFullscreen().catch(() => {});
-              setIsFullscreen(false);
+            {
+              if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+                if (document.exitFullscreen) {
+                  document.exitFullscreen().catch(() => {});
+                } else if (document.webkitExitFullscreen) {
+                  document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                  document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                  document.msExitFullscreen();
+                }
+                setIsFullscreen(false);
+              }
             }
             break;
 
@@ -236,7 +315,7 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
                 YouTube Live Player
               </span>
               <span className="text-xs font-semibold text-white truncate max-w-[180px] sm:max-w-[240px]">
-                {media.title}
+                {activeTitle || media.title}
               </span>
             </div>
           </div>
@@ -275,7 +354,7 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
 
         {/* Footer controls */}
         <div className="px-4 py-2.5 bg-slate-900/90 border-t border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <button
               onClick={() => {
                 if (playerRef.current && typeof playerRef.current.playVideo === 'function') {
@@ -295,6 +374,24 @@ export default function YouTubePlayer({ media, lastAction, onClose }) {
               className="px-2.5 py-1 bg-white/10 hover:bg-white/20 active:scale-95 rounded font-semibold text-white transition"
             >
               ⏸ Pause
+            </button>
+            <button
+              onClick={async () => {
+                if (videoId) {
+                  historyRef.current.push({ id: videoId, title: activeTitle });
+                }
+                const nextTrack = await YouTubeService.resolveNextVideo(videoId);
+                if (nextTrack && nextTrack.id) {
+                  setVideoId(nextTrack.id);
+                  setActiveTitle(nextTrack.title);
+                  if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
+                    playerRef.current.loadVideoById(nextTrack.id);
+                  }
+                }
+              }}
+              className="px-2.5 py-1 bg-white/10 hover:bg-white/20 active:scale-95 rounded font-semibold text-white transition"
+            >
+              ⏭ Next
             </button>
             <button
               onClick={() => {
