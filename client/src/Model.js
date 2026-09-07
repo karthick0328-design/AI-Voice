@@ -3,34 +3,24 @@ import React, { useRef, useEffect } from "react";
 
 function BoyModel({ animation, onAvatarClick }) {
   const group = useRef();
-  const { scene } = useGLTF("/model/boyAvatar1.glb");
-  const idle = useGLTF("/model/boy_idle.glb");
-  const talking = useGLTF("/model/boy_talking.glb");
-  const wave = useGLTF("/model/boy_wave.glb");
-
-  const combinedAnimations = [
-    ...(idle.animations || []),
-    ...(talking.animations || []),
-    ...(wave.animations || [])
-  ];
-
-  const { actions } = useAnimations(combinedAnimations, group);
+  const { scene, animations } = useGLTF("/model/animatedModel.glb");
+  const { actions } = useAnimations(animations, group);
 
   useEffect(() => {
     if (!actions) return;
     Object.values(actions).forEach((a) => a.stop());
 
-    let targetAction = null;
+    let target = null;
     if (animation === "wave" || animation === "hello" || animation === "hello.001") {
-      targetAction = actions["M_Standing_Expressions_001"] || actions["M_Talking_Variations_001"];
-    } else if (animation === "speaking" || animation?.includes("Layer") || animation === "Walk" || animation === "Run") {
-      targetAction = actions["M_Talking_Variations_001"];
+      target = actions["hello"] || actions["hello.001"] || actions["Armature|mixamo.com|Layer0.005 Retarget"];
+    } else if (animation === "speaking" || animation?.includes("Layer") || animation === "thinking.001") {
+      target = actions["Armature|mixamo.com|Layer0.005 Retarget"] || actions["thinking"];
     } else {
-      targetAction = actions["M_Standing_Idle_001"] || Object.values(actions)[0];
+      target = actions["idel Retarget"] || actions["idel"] || Object.values(actions)[0];
     }
 
-    if (targetAction) {
-      targetAction.reset().play();
+    if (target) {
+      target.reset().fadeIn(0.3).play();
     }
   }, [animation, actions]);
 
@@ -48,8 +38,8 @@ function BoyModel({ animation, onAvatarClick }) {
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
       onPointerOut={() => { document.body.style.cursor = 'auto'; }}
     >
-      <primitive object={scene} scale={1.2} rotation={[0, 0, 0]} />
-      {/* Invisible broad hitbox for 100% reliable click detection */}
+      <primitive object={scene} scale={1.3} rotation={[0, 0, 0]} />
+      {/* Invisible broad hitbox for 100% reliable click & tap detection */}
       <mesh position={[0, 1.0, 0]} onClick={handleClick} onPointerDown={handleClick} visible={false}>
         <boxGeometry args={[1.5, 2.2, 1]} />
         <meshBasicMaterial transparent opacity={0} />
@@ -77,7 +67,7 @@ function GirlModel({ animation, onAvatarClick }) {
     }
     
     if (target) {
-      target.reset().play();
+      target.reset().fadeIn(0.3).play();
     }
   }, [animation, actions]);
 
@@ -95,8 +85,8 @@ function GirlModel({ animation, onAvatarClick }) {
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
       onPointerOut={() => { document.body.style.cursor = 'auto'; }}
     >
-      <primitive object={scene} scale={1.4} rotation={[0, 0, 0]} />
-      {/* Invisible broad hitbox for 100% reliable click detection */}
+      <primitive object={scene} scale={1.35} rotation={[0, 0, 0]} />
+      {/* Invisible broad hitbox for 100% reliable click & tap detection */}
       <mesh position={[0, 1.0, 0]} onClick={handleClick} onPointerDown={handleClick} visible={false}>
         <boxGeometry args={[1.5, 2.2, 1]} />
         <meshBasicMaterial transparent opacity={0} />
@@ -113,8 +103,5 @@ export default function Model({ animation, avatarType = "boy", onAvatarClick }) 
   );
 }
 
-useGLTF.preload("/model/boyAvatar1.glb");
-useGLTF.preload("/model/boy_idle.glb");
-useGLTF.preload("/model/boy_talking.glb");
-useGLTF.preload("/model/boy_wave.glb");
+useGLTF.preload("/model/animatedModel.glb");
 useGLTF.preload("/model/animatedModel2.glb");

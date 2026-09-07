@@ -8,6 +8,7 @@ class SpeechService {
     this.maleVoice = null;
     this.femaleVoice = null;
     this.isUnlocked = false;
+    this.silenceTimer = null;
     this.initVoices();
   }
 
@@ -16,7 +17,7 @@ class SpeechService {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
-      recognition.continuous = false; // continuous = false is 100% reliable on iOS & Android!
+      recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = 'en-US';
       recognition.maxAlternatives = 1;
@@ -92,7 +93,6 @@ class SpeechService {
   startListening({ onTranscript, onError, onEnd }) {
     this.unlock();
 
-    // Re-create instance for 100% mobile compatibility on every turn
     try {
       if (this.recognition) {
         try { this.recognition.abort(); } catch (e) {}
@@ -105,28 +105,52 @@ class SpeechService {
 
       let finalTranscript = '';
       let interimTranscript = '';
+      let hasSubmitted = false;
+
+      const submitTranscript = (text) => {
+        if (hasSubmitted || !text.trim()) return;
+        hasSubmitted = true;
+        this.stopListening();
+        if (onTranscript) {
+          onTranscript({
+            interim: '',
+            final: text.trim(),
+            text: text.trim()
+          });
+        }
+      };
 
       this.recognition.onresult = (event) => {
         interimTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            finalTranscript += transcript;
+            finalTranscript += ' ' + transcript;
           } else {
             interimTranscript += transcript;
           }
         }
 
+        const currentText = (finalTranscript + ' ' + interimTranscript).trim();
         if (onTranscript) {
           onTranscript({
             interim: interimTranscript,
-            final: finalTranscript,
-            text: finalTranscript || interimTranscript
+            final: '',
+            text: currentText
           });
+        }
+
+        // Automatic smart pause detection (if user stops speaking for 1.2s, submit)
+        if (this.silenceTimer) clearTimeout(this.silenceTimer);
+        if (currentText.length > 1) {
+          this.silenceTimer = setTimeout(() => {
+            submitTranscript(currentText);
+          }, 1200);
         }
       };
 
       this.recognition.onerror = (event) => {
+        if (this.silenceTimer) clearTimeout(this.silenceTimer);
         if (event.error !== 'no-speech' && event.error !== 'aborted') {
           console.warn('[SpeechService] Recognition error:', event.error);
         }
@@ -135,8 +159,14 @@ class SpeechService {
       };
 
       this.recognition.onend = () => {
+        if (this.silenceTimer) clearTimeout(this.silenceTimer);
         this.isListening = false;
-        if (onEnd) onEnd();
+        const currentText = (finalTranscript + ' ' + interimTranscript).trim();
+        if (currentText && !hasSubmitted) {
+          submitTranscript(currentText);
+        } else if (onEnd) {
+          onEnd();
+        }
       };
 
       this.recognition.start();
@@ -151,6 +181,7 @@ class SpeechService {
   }
 
   stopListening() {
+    if (this.silenceTimer) clearTimeout(this.silenceTimer);
     if (this.recognition && this.isListening) {
       try {
         this.recognition.stop();
@@ -196,7 +227,6 @@ class SpeechService {
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.rate = Math.max(0.6, Math.min(1.8, speed));
 
-    // Ensure voices are initialized
     if (!this.maleVoice || !this.femaleVoice) {
       this.initVoices();
     }

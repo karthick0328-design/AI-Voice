@@ -5,6 +5,7 @@ import { Environment, Html, useProgress } from "@react-three/drei";
 import Model from "./Model.js";
 import bg from "./assets/real_room.jpg";
 import mic from "./assets/mic.png";
+import YouTubePlayer from "./components/media/YouTubePlayer.js";
 import { speechService } from './services/speechService.js';
 
 function Loader() {
@@ -20,7 +21,7 @@ function Loader() {
 
 const QUICK_ACTIONS = [
   { label: "👋 Say Hi", query: "Hi! How are you?" },
-  { label: "🎵 Play Music", query: "Play top trending songs on YouTube" },
+  { label: "🎵 Play Music", query: "Play a Kalyani song on YouTube" },
   { label: "⏰ What Time is it?", query: "What time is it now?" },
   { label: "😂 Tell a Joke", query: "Tell me a funny joke" },
   { label: "💡 Who are you?", query: "Who are you and what can you do?" }
@@ -103,7 +104,7 @@ const ImmersiveUI = () => {
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            <span>👦</span> Boy
+            <span>👦</span> Boy Avatar
           </button>
           <button
             onClick={() => { speechService.unlock(); setAvatarType("girl"); }}
@@ -113,45 +114,20 @@ const ImmersiveUI = () => {
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            <span>👧</span> Girl
+            <span>👧</span> Girl Avatar
           </button>
         </div>
       </div>
 
-      {/* Active YouTube / Google Action Banner */}
-      {activeMedia && (
-        <div className="relative z-30 mx-4 sm:mx-6 mt-2 max-w-md self-center flex items-center justify-between gap-3 bg-slate-950/90 backdrop-blur-xl border border-red-500/50 px-4 py-2.5 rounded-2xl shadow-2xl animate-in fade-in duration-300">
-          <div className="flex items-center gap-2.5 overflow-hidden">
-            <span className="text-base sm:text-lg">{activeMedia.type === 'youtube' ? '▶️' : '🔍'}</span>
-            <div className="flex flex-col truncate">
-              <span className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider">
-                {activeMedia.type === 'youtube' ? 'YouTube Music' : 'Google Search'}
-              </span>
-              <span className="text-xs sm:text-sm text-white font-medium truncate max-w-[200px]">
-                {activeMedia.title}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <a
-              href={activeMedia.directUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs font-bold bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white px-3 py-1.5 rounded-xl shadow-md transition flex items-center gap-1"
-            >
-              Open ↗
-            </a>
-            <button
-              onClick={() => setActiveMedia(null)}
-              className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+      {/* Embedded Live YouTube Video Player (in-room TV/Media Player) */}
+      {activeMedia && activeMedia.type === 'youtube' && (
+        <YouTubePlayer
+          media={activeMedia}
+          onClose={() => setActiveMedia(null)}
+        />
       )}
 
-      {/* 3D Canvas with Realistc Lighting & Camera */}
+      {/* 3D Canvas with Realistic Lighting & Camera */}
       <Canvas
         gl={{ alpha: true, antialias: true }}
         camera={{ position: [0, 0, 3.8], fov: 42 }}
@@ -182,7 +158,7 @@ const ImmersiveUI = () => {
       <div className="relative z-30 w-full px-4 pb-6 sm:pb-8 flex flex-col items-center gap-3">
         {/* Live Subtitle / AI Speech Bubble */}
         {(subtitle || aiText) && (
-          <div className="max-w-md w-full text-center px-4 py-2.5 rounded-2xl bg-slate-950/85 backdrop-blur-lg border border-purple-500/40 text-slate-100 text-xs sm:text-sm font-medium shadow-2xl animate-in fade-in duration-200">
+          <div className="max-w-xl w-full text-center px-5 py-3 rounded-2xl bg-slate-950/90 backdrop-blur-xl border border-purple-500/40 text-slate-100 text-xs sm:text-sm font-medium shadow-2xl animate-in fade-in duration-200">
             {subtitle && <p className="text-purple-300 font-semibold mb-0.5">{subtitle}</p>}
             {aiText && isSpeaking && <p className="text-slate-200">{aiText}</p>}
           </div>
@@ -194,7 +170,7 @@ const ImmersiveUI = () => {
             <button
               key={idx}
               onClick={() => handleQuickAction(item.query)}
-              className="flex-shrink-0 text-xs sm:text-sm font-medium px-3 py-1.5 bg-slate-900/80 backdrop-blur-md hover:bg-purple-600/30 border border-slate-700/60 hover:border-purple-400 text-slate-200 hover:text-white rounded-full transition duration-200 shadow-md active:scale-95"
+              className="flex-shrink-0 text-xs sm:text-sm font-medium px-3.5 py-1.5 bg-slate-900/80 backdrop-blur-md hover:bg-purple-600/30 border border-slate-700/60 hover:border-purple-400 text-slate-200 hover:text-white rounded-full transition duration-200 shadow-md active:scale-95"
             >
               {item.label}
             </button>
@@ -225,7 +201,7 @@ const ImmersiveUI = () => {
 
         {/* Instruction Note */}
         <p className="text-[11px] text-slate-400/90 text-center">
-          Tap the 3D Avatar to wave & say hi • Works on Android, iPhone & PC
+          Tap 3D Avatar to wave & speak • Ask "Play [song]" to watch YouTube right here
         </p>
       </div>
     </div>
