@@ -101,14 +101,50 @@ export default async function handler(req, res) {
     });
   }
 
-  // 1d. YouTube Status API
-  if (pathname === '/youtube/status' || pathname.startsWith('/youtube/status')) {
-    return res.status(200).json({
-      success: true,
-      isPlaying: true,
-      volume: 100,
-      isMuted: false
-    });
+  // 1e. Web & Google Search API (Server-side, zero CORS)
+  if (pathname === '/websearch' || pathname === '/google/search' || pathname.startsWith('/websearch') || pathname.startsWith('/google/search')) {
+    try {
+      const q = url.searchParams.get('q') || req.query?.q || 'trending news';
+      const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(q)}`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+        }
+      });
+      const html = await ddgRes.text();
+      const results = [];
+      const linkRegex = /<a class="result__url"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]*?<a class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi;
+      let m;
+      while ((m = linkRegex.exec(html)) !== null && results.length < 8) {
+        let destUrl = m[1].trim();
+        const uddgMatch = destUrl.match(/uddg=([^&]+)/);
+        if (uddgMatch && uddgMatch[1]) {
+          try {
+            destUrl = decodeURIComponent(uddgMatch[1]);
+          } catch (e) {}
+        }
+        results.push({
+          url: destUrl.startsWith('http') ? destUrl : `https://${destUrl.replace(/^\/\//, '')}`,
+          displayUrl: m[2].replace(/<[^>]+>/g, '').trim(),
+          snippet: m[3].replace(/<[^>]+>/g, '').trim()
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        query: q,
+        results,
+        googleUrl: `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+        snippet: results[0]?.snippet || `Search results for "${q}"`
+      });
+    } catch (e) {
+      return res.status(200).json({
+        success: true,
+        query: 'search',
+        results: [],
+        googleUrl: `https://www.google.com/search?q=${encodeURIComponent(q || '')}`,
+        snippet: `Google Search for "${q || ''}"`
+      });
+    }
   }
 
   // 2. Models

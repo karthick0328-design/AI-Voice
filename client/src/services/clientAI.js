@@ -376,35 +376,41 @@ export class ClientAI {
       lower.startsWith('what is mean by') ||
       lower.startsWith('what is the meaning of') ||
       lower.startsWith('meaning of') ||
+      lower.startsWith('who is') ||
+      lower.startsWith('what is') ||
+      lower.startsWith('tell me about') ||
+      lower.startsWith('explain') ||
       (lower.startsWith('search ') && !lower.includes('youtube') && !lower.includes('song') && !lower.includes('music'))
     ) {
       let rawQuery = text
-        .replace(/^(?:search\s+(?:on\s+)?google\s+(?:for|about)?|google\s+search\s+(?:for|about)?|google\s+|search\s+(?:for|about)?|search\s+)/gi, '')
+        .replace(/^(?:search\s+(?:on\s+)?google\s+(?:for|about)?|google\s+search\s+(?:for|about)?|google\s+|search\s+(?:for|about)?|search\s+|who\s+is|what\s+is|tell\s+me\s+about|explain)\s+/gi, '')
         .replace(/[\?\.]/g, '')
         .trim();
 
       if (!rawQuery) rawQuery = 'trending news and topics';
 
-      // Extract core topic keyword (e.g. "what is mean by Karthik" -> "Karthik")
+      // Extract core topic keyword
       const coreTopic = rawQuery
-        .replace(/^(?:what\s+is\s+mean\s+by|what\s+is\s+the\s+meaning\s+of|meaning\s+of|who\s+is|what\s+is|tell\s+me\s+about|explain)\s+/gi, '')
+        .replace(/^(?:mean\s+by|the\s+meaning\s+of|meaning\s+of)\s+/gi, '')
         .trim();
 
       let snippet = `Here are the search results and information for "${rawQuery}". Click below to explore live Google Search results.`;
-      
+      let searchResults = [];
+
       // Built-in intelligent meanings
-      const lowerTopic = coreTopic.toLowerCase();
-      if (lowerTopic === 'karthik' || lowerTopic === 'kartik') {
-        snippet = 'Karthik (or Kartikeya) is an Indian name of Sanskrit origin meaning radiant, courageous, one who bestows courage, and is associated with the deity Lord Murugan.';
-      } else if (coreTopic) {
+      const lowerTopic = (coreTopic || rawQuery).toLowerCase();
+      if (lowerTopic.includes('karthik') || lowerTopic.includes('kartik')) {
+        snippet = 'Karthik (or Kartikeya) is an Indian name of Sanskrit origin meaning radiant, courageous, one who bestows courage, and is associated with Lord Murugan / Kartikeya.';
+      } else {
         try {
-          const wikiRes = await fetch(
-            `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(coreTopic)}`
-          );
-          if (wikiRes.status === 200) {
-            const data = await wikiRes.json();
-            if (data && data.extract) {
-              snippet = data.extract.split('. ').slice(0, 3).join('. ') + '.';
+          const sRes = await fetch(`/api/websearch?q=${encodeURIComponent(rawQuery)}`);
+          if (sRes.ok) {
+            const sData = await sRes.json();
+            if (sData && sData.results && sData.results.length > 0) {
+              searchResults = sData.results;
+              if (sData.results[0].snippet) {
+                snippet = sData.results[0].snippet;
+              }
             }
           }
         } catch (e) {}
@@ -415,6 +421,7 @@ export class ClientAI {
         action: 'google',
         title: rawQuery,
         url: gUrl,
+        results: searchResults,
         snippet,
         response: snippet
       };
@@ -571,40 +578,7 @@ export class ClientAI {
     }
 
     // ═════════════════════════════════════════════════════════════════════════
-    // 11. WIKIPEDIA KNOWLEDGE LOOKUP
-    // ═════════════════════════════════════════════════════════════════════════
-    if (
-      lower.startsWith('who is') ||
-      lower.startsWith('what is') ||
-      lower.startsWith('tell me about') ||
-      lower.startsWith('explain')
-    ) {
-      const topic = text
-        .replace(/^(?:who is|what is|tell me about|explain)\s+/gi, '')
-        .replace(/[\?\.]/g, '')
-        .trim();
-
-      if (topic) {
-        try {
-          const res = await fetch(
-            `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`
-          );
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.extract) {
-              const shortExtract = data.extract.split('. ').slice(0, 2).join('. ') + '.';
-              return {
-                action: 'none',
-                response: shortExtract
-              };
-            }
-          }
-        } catch (e) {}
-      }
-    }
-
-    // ═════════════════════════════════════════════════════════════════════════
-    // 12. GENERAL CONVERSATION FALLBACK
+    // 11. GENERAL CONVERSATION FALLBACK
     // ═════════════════════════════════════════════════════════════════════════
     return {
       action: 'none',

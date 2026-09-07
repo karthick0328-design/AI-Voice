@@ -132,7 +132,8 @@ export const AgentProvider = ({ children }) => {
         type: 'google',
         title: localResult.title,
         directUrl: localResult.url,
-        snippet: localResult.snippet
+        snippet: localResult.snippet,
+        results: localResult.results || []
       });
       startSpeaking(localResult.response, 'hello');
       return;
