@@ -152,8 +152,15 @@ export const AgentProvider = ({ children }) => {
         }
       } catch (e) {}
 
-      // Clear any previous media card so no fake Google UI appears
-      setActiveMedia(null);
+      // Set activeMedia so authentic Google Search UI displays on screen
+      setActiveMedia({
+        type: 'google',
+        action: localResult.action,
+        query: localResult.query || localResult.title || text,
+        title: localResult.title || localResult.query || text,
+        directUrl: targetUrl
+      });
+      setLastAction(localResult);
       startSpeaking(localResult.response, 'hello');
       return;
     }

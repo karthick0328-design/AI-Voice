@@ -6,6 +6,7 @@ import Model from "./Model.js";
 import bg from "./assets/real_room.jpg";
 import mic from "./assets/mic.png";
 import YouTubePlayer from "./components/media/YouTubePlayer.js";
+import GoogleSearchUI from "./components/media/GoogleSearchUI.js";
 import { speechService } from './services/speechService.js';
 
 function Loader() {
@@ -125,6 +126,14 @@ const ImmersiveUI = () => {
         <YouTubePlayer
           media={activeMedia}
           lastAction={lastAction}
+          onClose={() => setActiveMedia(null)}
+        />
+      )}
+
+      {/* Embedded Authentic Real Google Search UI */}
+      {activeMedia && (activeMedia.type === 'google' || activeMedia.action === 'google_search' || activeMedia.action === 'google_open') && (
+        <GoogleSearchUI
+          media={activeMedia}
           onClose={() => setActiveMedia(null)}
         />
       )}
