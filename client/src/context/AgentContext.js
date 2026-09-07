@@ -10,6 +10,8 @@ export const AgentProvider = ({ children }) => {
   const [currentAnimation, setCurrentAnimation] = useState("idel Retarget.001");
   const [conversationId, setConversationId] = useState(null);
   const [avatarType, setAvatarType] = useState("boy"); // Default to Boy Avatar!
+  const [activeMedia, setActiveMedia] = useState(null); // Embedded YouTube/Media Player state!
+  const [subtitle, setSubtitle] = useState("");
   
   const stateRef = useRef({
     isListening: false,
@@ -46,6 +48,7 @@ export const AgentProvider = ({ children }) => {
     setCurrentAnimation(anim);
     setIsSpeaking(true);
     stateRef.current.isSpeaking = true;
+    setSubtitle(text);
     
     speechService.speak(text, {
       speed: 1.05,
@@ -54,12 +57,14 @@ export const AgentProvider = ({ children }) => {
         setIsSpeaking(false);
         setCurrentAnimation("idel Retarget.001");
         stateRef.current.isProcessing = false;
+        setTimeout(() => setSubtitle(""), 4000);
         resumeListening();
       },
       onError: () => {
         setIsSpeaking(false);
         setCurrentAnimation("idel Retarget.001");
         stateRef.current.isProcessing = false;
+        setTimeout(() => setSubtitle(""), 4000);
         resumeListening();
       }
     });
@@ -71,7 +76,8 @@ export const AgentProvider = ({ children }) => {
     setCurrentAnimation('hello.001');
 
     const success = speechService.startListening({
-      onTranscript: async ({ final }) => {
+      onTranscript: async ({ final, text: liveText }) => {
+        if (liveText) setSubtitle(`You: "${liveText}"`);
         if (!final || !final.trim()) return;
         
         const text = final.trim();
@@ -97,12 +103,24 @@ export const AgentProvider = ({ children }) => {
 
           if (!songQuery) songQuery = 'top songs';
           const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(songQuery)}`;
-          window.open(ytUrl, '_blank');
-          directActionMessage = `Opening YouTube for "${songQuery}" now!`;
+          const embedUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(songQuery)}&autoplay=1`;
+          
+          // Launch embedded media player directly in the app
+          setActiveMedia({
+            type: 'youtube',
+            title: songQuery,
+            embedUrl,
+            directUrl: ytUrl
+          });
+
+          // Also try window.open in case popups are allowed
+          try { window.open(ytUrl, '_blank'); } catch (e) {}
+
+          directActionMessage = `Opening YouTube player for "${songQuery}"!`;
         } else if (lower.includes('google') || (lower.includes('search') && !lower.includes('memory'))) {
           let query = text.replace(/open\s+(?:your\s+)?google/gi, '').replace(/search\s+(?:for\s+)?/gi, '').trim();
           if (query) {
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+            try { window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank'); } catch (e) {}
             directActionMessage = `Searching Google for "${query}".`;
           }
         }
@@ -117,7 +135,14 @@ export const AgentProvider = ({ children }) => {
                 aiResponse += data.text || data.token || "";
               } else if (type === 'tool_start' || type === 'tool_end') {
                 if (data.toolName === 'youtubeControl' && data.input?.query) {
-                  window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(data.input.query)}`, '_blank');
+                  const q = data.input.query;
+                  setActiveMedia({
+                    type: 'youtube',
+                    title: q,
+                    embedUrl: `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(q)}&autoplay=1`,
+                    directUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`
+                  });
+                  try { window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`, '_blank'); } catch (e) {}
                 }
               } else if (type === 'end' || type === 'conversation_created') {
                 if (data.conversationId) setConversationId(data.conversationId);
@@ -161,7 +186,9 @@ export const AgentProvider = ({ children }) => {
       isListening, startListening,
       isSpeaking, startSpeaking,
       currentAnimation, setCurrentAnimation,
-      avatarType, setAvatarType
+      avatarType, setAvatarType,
+      activeMedia, setActiveMedia,
+      subtitle
     }}>
       {children}
     </AgentContext.Provider>
