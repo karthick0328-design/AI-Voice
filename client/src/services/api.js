@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const API_BASE_URL = (typeof process !== 'undefined' && process.env && process.env.API_BASE_URL) || '';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -57,7 +59,7 @@ export const apiService = {
    * Stream Chat response using fetch ReadableStream
    */
   streamChat: async ({ conversationId, message, onEvent, signal }) => {
-    const response = await fetch('/api/chat/stream', {
+    const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ conversationId, message }),
