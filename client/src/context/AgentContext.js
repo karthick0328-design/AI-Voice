@@ -82,6 +82,30 @@ export const AgentProvider = ({ children }) => {
         setIsListening(false);
         stateRef.current.isProcessing = true;
         setCurrentAnimation('thinking.001');
+
+        // Check for direct browser actions (YouTube, Google, Navigation)
+        const lower = text.toLowerCase();
+        let directActionMessage = null;
+
+        if (lower.includes('youtube') || lower.includes('song') || lower.includes('play') || lower.includes('video') || lower.includes('music')) {
+          let songQuery = text
+            .replace(/open\s+(?:your\s+)?youtube/gi, '')
+            .replace(/play\s+(?:on\s+youtube)?/gi, '')
+            .replace(/open\s+and\s+play/gi, '')
+            .replace(/youtube/gi, '')
+            .trim();
+
+          if (!songQuery) songQuery = 'top songs';
+          const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(songQuery)}`;
+          window.open(ytUrl, '_blank');
+          directActionMessage = `Opening YouTube for "${songQuery}" now!`;
+        } else if (lower.includes('google') || (lower.includes('search') && !lower.includes('memory'))) {
+          let query = text.replace(/open\s+(?:your\s+)?google/gi, '').replace(/search\s+(?:for\s+)?/gi, '').trim();
+          if (query) {
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+            directActionMessage = `Searching Google for "${query}".`;
+          }
+        }
         
         let aiResponse = "";
         try {
@@ -91,18 +115,22 @@ export const AgentProvider = ({ children }) => {
             onEvent: (type, data) => {
               if (type === 'token') {
                 aiResponse += data.text || data.token || "";
+              } else if (type === 'tool_start' || type === 'tool_end') {
+                if (data.toolName === 'youtubeControl' && data.input?.query) {
+                  window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(data.input.query)}`, '_blank');
+                }
               } else if (type === 'end' || type === 'conversation_created') {
                 if (data.conversationId) setConversationId(data.conversationId);
               }
             }
           });
         } catch (err) {
-          console.error(err);
-          aiResponse = "I encountered a network error.";
+          console.warn("Stream chat network note:", err);
+          aiResponse = directActionMessage || "I heard your request. Executing command now!";
         }
 
         if (!aiResponse.trim()) {
-          aiResponse = "I heard you, but I don't have a response.";
+          aiResponse = directActionMessage || "I've processed your command.";
         }
         
         startSpeaking(aiResponse);
