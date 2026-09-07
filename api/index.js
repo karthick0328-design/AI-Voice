@@ -28,10 +28,12 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const url = new URL(req.url, https://);
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
+  const protocol = req.headers['x-forwarded-proto'] || 'https';
+  const url = new URL(req.url, `${protocol}://${host}`);
   const pathname = url.pathname.replace(/^\/api/, '');
 
-  console.log([Vercel Serverless]  );
+  console.log(`[Vercel Serverless] ${req.method} ${pathname}`);
 
   // 1. Health check
   if (pathname === '/health' || pathname === '') {
@@ -149,7 +151,7 @@ export default async function handler(req, res) {
     });
 
     const sendSSE = (event, data) => {
-      res.write(event: \ndata: \n\n);
+      res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
     };
 
     sendSSE('state_change', { statusText: 'Analyzing intent & selecting tools...' });
@@ -169,7 +171,7 @@ export default async function handler(req, res) {
 
       if (!songQuery) songQuery = 'top songs';
 
-      sendSSE('state_change', { statusText: Launching YouTube player for ""... });
+      sendSSE('state_change', { statusText: `Launching YouTube player for "${songQuery}"...` });
       sendSSE('tool_start', {
         toolName: 'youtubeControl',
         input: { action: 'open_and_play', target: 'youtube', query: songQuery }
@@ -184,27 +186,27 @@ export default async function handler(req, res) {
       sendSSE('tool_end', {
         toolName: 'youtubeControl',
         status: 'completed',
-        result: Successfully launched YouTube search and playback for: ""
+        result: `Successfully launched YouTube search and playback for: "${songQuery}"`
       });
 
-      assistantReply = I've opened YouTube and started playing "" for you! Enjoy listening! 🎵;
+      assistantReply = `I've opened YouTube and started playing "${songQuery}" for you! Enjoy listening! 🎵`;
     } else if (lower.includes('time') || lower.includes('clock') || lower.includes('date')) {
       const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' on ' + new Date().toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
       sendSSE('tool_start', { toolName: 'getCurrentTime', input: {} });
       sendSSE('tool_end', { toolName: 'getCurrentTime', status: 'completed', result: nowStr });
-      assistantReply = The current time is .;
+      assistantReply = `The current time is ${nowStr}.`;
     } else if (lower.includes('search') || lower.includes('who is') || lower.includes('what is') || lower.includes('news')) {
       const query = userMessage.replace(/search for|search|what is|who is/gi, '').trim();
       sendSSE('tool_start', { toolName: 'webSearch', input: { query } });
-      sendSSE('tool_end', { toolName: 'webSearch', status: 'completed', result: Found results for  });
-      assistantReply = Here is what I found regarding "": Aether is actively monitoring real-time feeds and knowledge systems to keep you up to date.;
+      sendSSE('tool_end', { toolName: 'webSearch', status: 'completed', result: `Found results for ${query}` });
+      assistantReply = `Here is what I found regarding "${query}": Aether is actively monitoring real-time feeds and knowledge systems to keep you up to date.`;
     } else if (lower.includes('remind') || lower.includes('task') || lower.includes('todo')) {
       const taskTitle = userMessage.replace(/remind me to|create task|add task/gi, '').trim() || 'New Reminder';
       sendSSE('tool_start', { toolName: 'createTask', input: { title: taskTitle } });
-      sendSSE('tool_end', { toolName: 'createTask', status: 'completed', result: Task "" created });
-      assistantReply = I've recorded that task: "". You can track it in your Tasks board.;
+      sendSSE('tool_end', { toolName: 'createTask', status: 'completed', result: `Task "${taskTitle}" created` });
+      assistantReply = `I've recorded that task: "${taskTitle}". You can track it in your Tasks board.`;
     } else {
-      assistantReply = I've received your command: "".\n\nAether AI OS is fully active in cloud serverless mode! You can ask me to play music on YouTube, calculate numbers, search the web, manage memories, and execute workflows.;
+      assistantReply = `I've received your command: "${userMessage}".\n\nAether AI OS is fully active in cloud serverless mode! You can ask me to play music on YouTube, calculate numbers, search the web, manage memories, and execute workflows.`;
     }
 
     // Stream the assistant tokens smoothly
@@ -226,7 +228,7 @@ export default async function handler(req, res) {
   if (pathname === '/chat' && req.method === 'POST') {
     const userMessage = req.body?.message || '';
     return res.status(200).json({
-      aiResponse: Received: "". Aether AI Operating System is active and ready.
+      aiResponse: `Received: "${userMessage}". Aether AI Operating System is active and ready.`
     });
   }
 
