@@ -36,8 +36,9 @@ const ImmersiveUI = () => {
     currentAnimation, 
     avatarType, 
     setAvatarType,
-    activeMedia,
+    activeMedia, 
     setActiveMedia,
+    lastAction,
     subtitle,
     aiText,
     handleQuery
@@ -123,6 +124,7 @@ const ImmersiveUI = () => {
       {activeMedia && activeMedia.type === 'youtube' && (
         <YouTubePlayer
           media={activeMedia}
+          lastAction={lastAction}
           onClose={() => setActiveMedia(null)}
         />
       )}

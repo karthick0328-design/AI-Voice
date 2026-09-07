@@ -10,8 +10,9 @@ export const AgentProvider = ({ children }) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentAnimation, setCurrentAnimation] = useState("idel Retarget.001");
   const [conversationId, setConversationId] = useState(null);
-  const [avatarType, setAvatarType] = useState("boy"); // Default to Boy Avatar!
-  const [activeMedia, setActiveMedia] = useState(null); // Embedded YouTube/Media Player state
+  const [avatarType, setAvatarType] = useState("boy");
+  const [activeMedia, setActiveMedia] = useState(null); // Embedded YouTube state
+  const [lastAction, setLastAction] = useState(null); // Last YouTube action object
   const [subtitle, setSubtitle] = useState("");
   const [aiText, setAiText] = useState("");
   
@@ -20,14 +21,15 @@ export const AgentProvider = ({ children }) => {
     isSpeaking: false,
     conversationId: null,
     isProcessing: false,
-    avatarType: "boy"
+    avatarType: "boy",
+    activeMedia: null
   });
 
-  // Sync refs with state
   useEffect(() => { stateRef.current.isListening = isListening; }, [isListening]);
   useEffect(() => { stateRef.current.isSpeaking = isSpeaking; }, [isSpeaking]);
   useEffect(() => { stateRef.current.conversationId = conversationId; }, [conversationId]);
   useEffect(() => { stateRef.current.avatarType = avatarType; }, [avatarType]);
+  useEffect(() => { stateRef.current.activeMedia = activeMedia; }, [activeMedia]);
 
   const startSpeaking = useCallback((text, customAnimation = null) => {
     if (!text) {
@@ -35,7 +37,6 @@ export const AgentProvider = ({ children }) => {
       return;
     }
     
-    // Play custom animation (e.g. "hello" for wave) or default talking animation
     const anim = customAnimation || "speaking";
     setCurrentAnimation(anim);
     setIsSpeaking(true);
@@ -44,7 +45,7 @@ export const AgentProvider = ({ children }) => {
     
     speechService.speak(text, {
       speed: 1.05,
-      gender: stateRef.current.avatarType, // 👦 Boy Voice for Boy Avatar, 👧 Girl Voice for Girl Avatar!
+      gender: stateRef.current.avatarType,
       onEnd: () => {
         setIsSpeaking(false);
         stateRef.current.isSpeaking = false;
@@ -67,19 +68,22 @@ export const AgentProvider = ({ children }) => {
     stateRef.current.isProcessing = true;
     setCurrentAnimation('thinking.001');
 
-    // 1. First, process with intelligent Client AI engine
-    const localResult = await ClientAI.processQuery(text, stateRef.current.avatarType);
+    // 1. Process with ClientAI Natural Action Layer
+    const localResult = await ClientAI.processQuery(text, stateRef.current.avatarType, stateRef.current.activeMedia);
 
-    if (localResult.action === 'youtube') {
+    // If new YouTube playback requested
+    if (localResult.action === 'youtube_play') {
       setActiveMedia({
         type: 'youtube',
         title: localResult.title,
         directUrl: localResult.url
       });
+      setLastAction(localResult);
       startSpeaking(localResult.response, 'hello');
       return;
     }
 
+    // If Google search requested
     if (localResult.action === 'google') {
       setActiveMedia({
         type: 'google',
@@ -87,6 +91,17 @@ export const AgentProvider = ({ children }) => {
         directUrl: localResult.url
       });
       startSpeaking(localResult.response, 'hello');
+      return;
+    }
+
+    // If YouTube action (pause, resume, seek, volume, speed, captions, restart, etc.)
+    if (
+      localResult.action &&
+      localResult.action !== 'none' &&
+      localResult.action !== 'wave'
+    ) {
+      setLastAction({ ...localResult, timestamp: Date.now() });
+      startSpeaking(localResult.response, 'speaking');
       return;
     }
 
@@ -104,9 +119,7 @@ export const AgentProvider = ({ children }) => {
           }
         }
       });
-    } catch (e) {
-      // Backend not running / deployed static mode
-    }
+    } catch (e) {}
 
     const finalAnswer = serverResponse.trim() || localResult.response;
     const animToPlay = localResult.action === 'wave' ? 'hello' : 'speaking';
@@ -151,6 +164,7 @@ export const AgentProvider = ({ children }) => {
       currentAnimation, setCurrentAnimation,
       avatarType, setAvatarType,
       activeMedia, setActiveMedia,
+      lastAction, setLastAction,
       subtitle, aiText,
       handleQuery
     }}>
