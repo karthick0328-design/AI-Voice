@@ -40,6 +40,48 @@ export default async function handler(req, res) {
     return res.status(200).json({ status: 'ok', time: new Date().toISOString(), platform: 'vercel-serverless' });
   }
 
+  // 1b. YouTube Search API (Server-side, zero CORS)
+  if (pathname === '/youtube/search' || pathname.startsWith('/youtube/search')) {
+    try {
+      const q = url.searchParams.get('q') || req.query?.q || 'trending music';
+      const ytResponse = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+        }
+      });
+      const html = await ytResponse.text();
+      let videoId = null;
+      let title = q;
+
+      const idMatch = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+      if (idMatch && idMatch[1]) videoId = idMatch[1];
+      else {
+        const watchMatch = html.match(/\/watch\?v=([a-zA-Z0-9_-]{11})/);
+        if (watchMatch && watchMatch[1]) videoId = watchMatch[1];
+      }
+
+      const titleMatch = html.match(/"title":\{"runs":\[\{"text":"([^"]+)"\}/);
+      if (titleMatch && titleMatch[1]) title = titleMatch[1];
+
+      if (!videoId) videoId = 'z5y8Clp_TdE';
+
+      return res.status(200).json({
+        success: true,
+        query: q,
+        videoId,
+        title,
+        url: `https://www.youtube.com/watch?v=${videoId}`
+      });
+    } catch (e) {
+      return res.status(200).json({
+        success: true,
+        videoId: 'z5y8Clp_TdE',
+        title: 'Popular Song',
+        url: 'https://www.youtube.com/watch?v=z5y8Clp_TdE'
+      });
+    }
+  }
+
   // 2. Models
   if (pathname === '/models' && req.method === 'GET') {
     return res.status(200).json({

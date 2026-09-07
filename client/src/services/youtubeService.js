@@ -1,11 +1,12 @@
 /**
  * YouTube Service - Resolves song queries to real, playable YouTube Video IDs
- * using backend proxy with instant fallback mapping (zero CORS errors).
+ * dynamically via serverless backend with zero CORS issues.
  */
 
 const POPULAR_SONGS_MAP = {
   'kalyani': 'z5y8Clp_TdE',
-  'ridhima': 'z5y8Clp_TdE',
+  'ridhima': 'jR3rWCBeO6M',
+  'the lady': 'GoGl1pT0TSM',
   'na ready': '3wDiqlTNlfQ',
   'leo': '3wDiqlTNlfQ',
   'arabic kuthu': '8FAUEv_E_x4',
@@ -30,24 +31,25 @@ export class YouTubeService {
     const clean = (query || '').toLowerCase().trim();
     if (!clean) return 'z5y8Clp_TdE';
 
-    // 1. Check instant local mapping
-    for (const [key, id] of Object.entries(POPULAR_SONGS_MAP)) {
-      if (clean.includes(key)) {
-        return id;
-      }
-    }
-
-    // 2. Try backend search endpoint (server-side, zero CORS)
+    // 1. First, call the serverless search endpoint (server-side, zero CORS)
     try {
       const res = await fetch(`/api/youtube/search?q=${encodeURIComponent(query)}`);
       if (res.ok) {
         const data = await res.json();
         if (data && data.videoId) {
+          console.log(`[YouTubeService] Resolved "${query}" -> ${data.videoId} (${data.title})`);
           return data.videoId;
         }
       }
     } catch (e) {
-      // Backend not running / deployed static mode
+      console.warn('[YouTubeService] Serverless search note:', e.message);
+    }
+
+    // 2. Check local mapping fallback
+    for (const [key, id] of Object.entries(POPULAR_SONGS_MAP)) {
+      if (clean.includes(key)) {
+        return id;
+      }
     }
 
     // 3. Fallback default
