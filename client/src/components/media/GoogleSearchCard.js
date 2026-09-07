@@ -32,13 +32,15 @@ export default function GoogleSearchCard({ media, onClose }) {
           </div>
 
           <div className="flex items-center gap-1.5">
-            <button
-              onClick={handleOpenGoogle}
-              className="text-[11px] font-semibold text-blue-300 hover:text-white bg-blue-600/30 hover:bg-blue-600/50 px-2.5 py-1 rounded-lg transition border border-blue-400/30"
+            <a
+              href={googleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-semibold text-blue-300 hover:text-white bg-blue-600/30 hover:bg-blue-600/50 px-2.5 py-1 rounded-lg transition border border-blue-400/30 flex items-center gap-1"
               title="Open full Google search in new tab"
             >
               Open Tab ↗
-            </button>
+            </a>
             <button
               onClick={onClose}
               className="text-slate-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-white/10 transition text-sm font-bold"
@@ -51,23 +53,25 @@ export default function GoogleSearchCard({ media, onClose }) {
 
         {/* Content Body */}
         <div className="p-4 sm:p-5 flex flex-col gap-3">
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5">
-            <p className="text-xs text-slate-300 leading-relaxed">
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 shadow-inner">
+            <p className="text-xs text-slate-200 leading-relaxed font-medium">
               {media.snippet || `Searching Google for "${searchQuery}". Click below to explore all live results, news, images, and knowledge panels.`}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleOpenGoogle}
+            <a
+              href={googleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2"
             >
-              <span>🔍</span> View Google Results
-            </button>
+              <span>🔍</span> View Google Results ↗
+            </a>
             <a
               href={`https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="py-2.5 px-3.5 bg-red-600/20 hover:bg-red-600/30 text-red-300 hover:text-red-200 border border-red-500/30 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5"
             >
               <span>▶</span> YouTube

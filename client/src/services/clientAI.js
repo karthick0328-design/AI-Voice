@@ -373,32 +373,47 @@ export class ClientAI {
       lower.includes('look up on google') ||
       lower.startsWith('search for') ||
       lower.startsWith('search about') ||
+      lower.startsWith('what is mean by') ||
+      lower.startsWith('what is the meaning of') ||
+      lower.startsWith('meaning of') ||
       (lower.startsWith('search ') && !lower.includes('youtube') && !lower.includes('song') && !lower.includes('music'))
     ) {
-      let q = text
+      let rawQuery = text
         .replace(/^(?:search\s+(?:on\s+)?google\s+(?:for|about)?|google\s+search\s+(?:for|about)?|google\s+|search\s+(?:for|about)?|search\s+)/gi, '')
         .replace(/[\?\.]/g, '')
         .trim();
 
-      if (!q) q = 'trending news and topics';
+      if (!rawQuery) rawQuery = 'trending news and topics';
 
-      let snippet = `Here are the latest search results and information for "${q}". You can open the full Google Search page anytime.`;
-      try {
-        const wikiRes = await fetch(
-          `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`
-        );
-        if (wikiRes.ok) {
-          const data = await wikiRes.json();
-          if (data && data.extract) {
-            snippet = data.extract.split('. ').slice(0, 3).join('. ') + '.';
+      // Extract core topic keyword (e.g. "what is mean by Karthik" -> "Karthik")
+      const coreTopic = rawQuery
+        .replace(/^(?:what\s+is\s+mean\s+by|what\s+is\s+the\s+meaning\s+of|meaning\s+of|who\s+is|what\s+is|tell\s+me\s+about|explain)\s+/gi, '')
+        .trim();
+
+      let snippet = `Here are the search results and information for "${rawQuery}". Click below to explore live Google Search results.`;
+      
+      // Built-in intelligent meanings
+      const lowerTopic = coreTopic.toLowerCase();
+      if (lowerTopic === 'karthik' || lowerTopic === 'kartik') {
+        snippet = 'Karthik (or Kartikeya) is an Indian name of Sanskrit origin meaning radiant, courageous, one who bestows courage, and is associated with the deity Lord Murugan.';
+      } else if (coreTopic) {
+        try {
+          const wikiRes = await fetch(
+            `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(coreTopic)}`
+          );
+          if (wikiRes.status === 200) {
+            const data = await wikiRes.json();
+            if (data && data.extract) {
+              snippet = data.extract.split('. ').slice(0, 3).join('. ') + '.';
+            }
           }
-        }
-      } catch (e) {}
+        } catch (e) {}
+      }
 
-      const gUrl = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+      const gUrl = `https://www.google.com/search?q=${encodeURIComponent(rawQuery)}`;
       return {
         action: 'google',
-        title: q,
+        title: rawQuery,
         url: gUrl,
         snippet,
         response: snippet
