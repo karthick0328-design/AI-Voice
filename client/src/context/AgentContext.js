@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useRef, useEffect, useCallb
 import { apiService } from '../services/api.js';
 import { speechService } from '../services/speechService.js';
 import { ClientAI } from '../services/clientAI.js';
+import { YouTubeService } from '../services/youtubeService.js';
 
 const AgentContext = createContext();
 
@@ -30,6 +31,22 @@ export const AgentProvider = ({ children }) => {
   useEffect(() => { stateRef.current.conversationId = conversationId; }, [conversationId]);
   useEffect(() => { stateRef.current.avatarType = avatarType; }, [avatarType]);
   useEffect(() => { stateRef.current.activeMedia = activeMedia; }, [activeMedia]);
+
+  const openTab = (url) => {
+    try {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {}
+    try {
+      const win = window.open(url, '_blank');
+      if (win) win.focus();
+    } catch (e) {}
+  };
 
   const startSpeaking = useCallback((text, customAnimation = null) => {
     if (!text) {
@@ -73,18 +90,26 @@ export const AgentProvider = ({ children }) => {
 
     // If new YouTube playback requested
     if (localResult.action === 'youtube_play') {
+      const videoId = await YouTubeService.resolveVideoId(localResult.title);
+      const watchUrl = `https://www.youtube.com/watch?v=${videoId}&autoplay=1`;
+      
+      // Directly open the watch URL so YouTube actually starts playing!
+      openTab(watchUrl);
+
       setActiveMedia({
         type: 'youtube',
         title: localResult.title,
-        directUrl: localResult.url
+        videoId,
+        directUrl: watchUrl
       });
-      setLastAction(localResult);
+      setLastAction({ ...localResult, videoId });
       startSpeaking(localResult.response, 'hello');
       return;
     }
 
     // If Google search requested
     if (localResult.action === 'google') {
+      openTab(localResult.url);
       setActiveMedia({
         type: 'google',
         title: localResult.title,

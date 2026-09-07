@@ -391,12 +391,9 @@ export class ClientAI {
         .trim();
 
       if (!songQuery) songQuery = 'top trending music';
-      const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(songQuery)}`;
-
       return {
         action: 'youtube_play',
         title: songQuery,
-        url: ytUrl,
         response: `Playing "${songQuery}" on YouTube for you right now!`
       };
     }
