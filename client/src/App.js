@@ -6,6 +6,7 @@ import Model from "./Model.js";
 import bg from "./assets/real_room.jpg";
 import mic from "./assets/mic.png";
 import YouTubePlayer from "./components/media/YouTubePlayer.js";
+import GoogleSearchCard from "./components/media/GoogleSearchCard.js";
 import { speechService } from './services/speechService.js';
 
 function Loader() {
@@ -125,6 +126,14 @@ const ImmersiveUI = () => {
         <YouTubePlayer
           media={activeMedia}
           lastAction={lastAction}
+          onClose={() => setActiveMedia(null)}
+        />
+      )}
+
+      {/* Embedded Live Google Search Card */}
+      {activeMedia && activeMedia.type === 'google' && (
+        <GoogleSearchCard
+          media={activeMedia}
           onClose={() => setActiveMedia(null)}
         />
       )}

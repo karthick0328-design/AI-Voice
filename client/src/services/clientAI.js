@@ -363,7 +363,50 @@ export class ClientAI {
     }
 
     // ═════════════════════════════════════════════════════════════════════════
-    // 3. YOUTUBE SEARCH & PLAY (New Video / Song Request)
+    // 3. GOOGLE / WEB SEARCH (Check before generic YouTube fallback)
+    // ═════════════════════════════════════════════════════════════════════════
+    if (
+      lower.startsWith('google') ||
+      lower.includes('search google') ||
+      lower.includes('google search') ||
+      lower.includes('search on google') ||
+      lower.includes('look up on google') ||
+      lower.startsWith('search for') ||
+      lower.startsWith('search about') ||
+      (lower.startsWith('search ') && !lower.includes('youtube') && !lower.includes('song') && !lower.includes('music'))
+    ) {
+      let q = text
+        .replace(/^(?:search\s+(?:on\s+)?google\s+(?:for|about)?|google\s+search\s+(?:for|about)?|google\s+|search\s+(?:for|about)?|search\s+)/gi, '')
+        .replace(/[\?\.]/g, '')
+        .trim();
+
+      if (!q) q = 'trending news and topics';
+
+      let snippet = `Here are the latest search results and information for "${q}". You can open the full Google Search page anytime.`;
+      try {
+        const wikiRes = await fetch(
+          `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`
+        );
+        if (wikiRes.ok) {
+          const data = await wikiRes.json();
+          if (data && data.extract) {
+            snippet = data.extract.split('. ').slice(0, 3).join('. ') + '.';
+          }
+        }
+      } catch (e) {}
+
+      const gUrl = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+      return {
+        action: 'google',
+        title: q,
+        url: gUrl,
+        snippet,
+        response: snippet
+      };
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // 4. YOUTUBE SEARCH & PLAY (New Video / Song Request)
     // ═════════════════════════════════════════════════════════════════════════
     if (
       lower.includes('youtube') ||
@@ -396,31 +439,6 @@ export class ClientAI {
         title: songQuery,
         response: `Playing "${songQuery}" on YouTube for you right now!`
       };
-    }
-
-    // ═════════════════════════════════════════════════════════════════════════
-    // 4. GOOGLE SEARCH
-    // ═════════════════════════════════════════════════════════════════════════
-    if (
-      lower.startsWith('search') ||
-      lower.startsWith('google') ||
-      lower.includes('search google for') ||
-      lower.includes('search for')
-    ) {
-      const q = text
-        .replace(/^search\s+(?:google\s+)?(?:for\s+)?/gi, '')
-        .replace(/^google\s+/gi, '')
-        .trim();
-
-      if (q) {
-        const gUrl = `https://www.google.com/search?q=${encodeURIComponent(q)}`;
-        return {
-          action: 'google',
-          title: q,
-          url: gUrl,
-          response: `Searching Google for "${q}".`
-        };
-      }
     }
 
     // ═════════════════════════════════════════════════════════════════════════

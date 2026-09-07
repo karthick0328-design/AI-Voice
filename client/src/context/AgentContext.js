@@ -131,7 +131,8 @@ export const AgentProvider = ({ children }) => {
       setActiveMedia({
         type: 'google',
         title: localResult.title,
-        directUrl: localResult.url
+        directUrl: localResult.url,
+        snippet: localResult.snippet
       });
       startSpeaking(localResult.response, 'hello');
       return;
