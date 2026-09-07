@@ -89,6 +89,23 @@ export const AgentProvider = ({ children }) => {
         stateRef.current.isProcessing = true;
         setCurrentAnimation('thinking.001');
 
+        // Helper to reliably open external tabs
+        const openInNewTab = (url) => {
+          try {
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } catch (e) {}
+          try {
+            const win = window.open(url, '_blank');
+            if (win) win.focus();
+          } catch (e) {}
+        };
+
         // Check for direct browser actions (YouTube, Google, Navigation)
         const lower = text.toLowerCase();
         let directActionMessage = null;
@@ -107,24 +124,22 @@ export const AgentProvider = ({ children }) => {
 
           if (!songQuery) songQuery = 'top songs';
           const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(songQuery)}`;
-          const embedUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(songQuery)}&autoplay=1`;
           
-          // Launch embedded media player directly in the app
+          // Open YouTube in new tab
+          openInNewTab(ytUrl);
+
           setActiveMedia({
             type: 'youtube',
             title: songQuery,
-            embedUrl,
             directUrl: ytUrl
           });
 
-          // Also try window.open in case popups are allowed
-          try { window.open(ytUrl, '_blank'); } catch (e) {}
-
-          directActionMessage = `Opening YouTube player for "${songQuery}"!`;
+          directActionMessage = `Opened YouTube for "${songQuery}" in a new tab! Enjoy listening!`;
         } else if (lower.includes('google') || (lower.includes('search') && !lower.includes('memory'))) {
           let query = text.replace(/open\s+(?:your\s+)?google/gi, '').replace(/search\s+(?:for\s+)?/gi, '').trim();
           if (query) {
-            try { window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank'); } catch (e) {}
+            const gUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            openInNewTab(gUrl);
             directActionMessage = `Searching Google for "${query}".`;
           }
         }
@@ -140,13 +155,13 @@ export const AgentProvider = ({ children }) => {
               } else if (type === 'tool_start' || type === 'tool_end') {
                 if (data.toolName === 'youtubeControl' && data.input?.query) {
                   const q = data.input.query;
+                  const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+                  openInNewTab(ytUrl);
                   setActiveMedia({
                     type: 'youtube',
                     title: q,
-                    embedUrl: `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(q)}&autoplay=1`,
-                    directUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`
+                    directUrl: ytUrl
                   });
-                  try { window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`, '_blank'); } catch (e) {}
                 }
               } else if (type === 'end' || type === 'conversation_created') {
                 if (data.conversationId) setConversationId(data.conversationId);

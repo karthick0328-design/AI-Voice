@@ -64,42 +64,30 @@ const ImmersiveUI = () => {
         alt="Real room background"
       />
 
-      {/* Floating Embedded YouTube Player Card */}
+      {/* Active YouTube Tab Action Badge */}
       {activeMedia && activeMedia.type === 'youtube' && (
-        <div className="absolute top-6 left-6 z-30 w-80 md:w-96 rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-purple-500/40 p-3 shadow-2xl animate-in fade-in slide-in-from-left-5 duration-300">
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <span className="text-red-500 font-bold text-base">▶</span>
-              <span className="text-xs font-semibold text-white truncate max-w-[180px]">
-                {activeMedia.title}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <a
-                href={activeMedia.directUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-[11px] font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-950/60 px-2 py-1 rounded-lg border border-cyan-800/50 flex items-center gap-1"
-              >
-                Open Tab ↗
-              </a>
-              <button
-                onClick={() => setActiveMedia(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition"
-              >
-                ✕
-              </button>
-            </div>
+        <div className="absolute top-6 left-6 z-30 flex items-center gap-3 bg-slate-900/90 backdrop-blur-xl border border-red-500/40 px-4 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="bg-red-600/20 p-2 rounded-xl text-red-400 font-bold">
+            ▶
           </div>
-          <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-black shadow-inner">
-            <iframe
-              title="YouTube Player"
-              src={activeMedia.embedUrl}
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-white">YouTube Playing</span>
+            <span className="text-[11px] text-slate-300 font-mono max-w-[200px] truncate">{activeMedia.title}</span>
           </div>
+          <a
+            href={activeMedia.directUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs font-semibold bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-xl shadow-md transition ml-2 flex items-center gap-1"
+          >
+            Switch to Tab ↗
+          </a>
+          <button
+            onClick={() => setActiveMedia(null)}
+            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition ml-1"
+          >
+            ✕
+          </button>
         </div>
       )}
 
